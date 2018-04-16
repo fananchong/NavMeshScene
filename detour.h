@@ -10,6 +10,7 @@ public:
 
     int Load(const char*path);
 
+
 private:
     int mMaxNode;
     dtNavMesh* mMesh;

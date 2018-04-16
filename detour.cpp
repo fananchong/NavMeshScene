@@ -25,9 +25,9 @@ public:
         :fp(nullptr)
     {
 #pragma warning(push)
-#pragma warning(disable:4996) 
+#pragma warning(disable: 4996)
         fp = fopen(path, "rb");
-#pragma warning(pop   )
+#pragma warning(pop)
     }
     ~FileReader() {
         if (fp) {
@@ -63,7 +63,6 @@ Detour::~Detour() {
 }
 
 int Detour::Load(const char*path) {
-
     FileReader fp(path);
     if (fp == 0) {
         return 1;

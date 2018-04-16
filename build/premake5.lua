@@ -1,6 +1,6 @@
 workspace "NavMeshScene"
     configurations { "Debug", "Release" }
-    platforms { "x64" }
+    platforms { "x32", "x64" }
     targetdir "../bin/%{cfg.buildcfg}"
     language "C++"
     includedirs {
@@ -25,11 +25,22 @@ workspace "NavMeshScene"
     
     
 project "NavMeshScene"
-    kind "ConsoleApp"
+    kind "StaticLib"
     targetname "NavMeshScene"
     files {
         "../*.h",
         "../*.cpp",
         "../Detour/**",
+    }
+    
+project "example"
+    kind "ConsoleApp"
+    targetname "example"
+    includedirs { "../*.h" }
+    libdirs { "../bin" }
+    links { "NavMeshScene" }
+    files {
+        "../example/*.h",
+        "../example/*.cpp",
     }
     
