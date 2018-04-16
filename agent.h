@@ -1,23 +1,25 @@
+#include "vector3.h"
 
-class Agent {
-public:
+namespace NavMeshScene {
 
-    Agent();
-    ~Agent();
+    class Agent {
+    public:
 
-    inline int GetPosX() { return posX; }
-    inline int GetPosY() { return posY; }
-    inline int GetPosZ() { return posZ; }
-    inline unsigned int GetRadius() { return radius; }
+        Agent();
+        ~Agent();
 
-    inline void SetPosX(int v) { posX = v; }
-    inline void SetPosY(int v) { posY = v; }
-    inline void SetPosZ(int v) { posZ = v; }
-    inline void SetRadius(int v) { radius = v; }
+        inline Vector3 GetPosition() { return mPosition; }
+        inline Vector3 GetVelocity() { return mVelocity; }
+        inline float GetRadius() { return mRadius; }
 
-private:
-    int posX;
-    int posY;
-    int posZ;
-    unsigned int radius;
-};
+        inline void SetPosition(const Vector3& v) { mPosition = v; }
+        inline void SetVelocity(const Vector3& v) { mVelocity = v; }
+        inline void SetRadius(float v) { mRadius = v; }
+
+    private:
+        Vector3 mPosition;
+        Vector3 mVelocity;
+        float mRadius;
+    };
+
+}

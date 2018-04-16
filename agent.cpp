@@ -1,9 +1,13 @@
 #include "agent.h"
 
-Agent::Agent() {
+namespace NavMeshScene {
 
-}
+    Agent::Agent() {
 
-Agent::~Agent() {
+    }
+
+    Agent::~Agent() {
+
+    }
 
 }

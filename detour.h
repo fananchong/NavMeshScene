@@ -2,17 +2,21 @@
 #include <DetourNavMeshQuery.h>
 #include <cstdint>
 
-class Detour {
-public:
+namespace NavMeshScene {
 
-    Detour(uint16_t maxNode = 2048);
-    ~Detour();
+    class Detour {
+    public:
 
-    int Load(const char*path);
+        Detour(uint16_t maxNode = 2048);
+        ~Detour();
+
+        int Load(const char* path);
 
 
-private:
-    int mMaxNode;
-    dtNavMesh* mMesh;
-    dtNavMeshQuery* mQuery;
-};
+    private:
+        int mMaxNode;
+        dtNavMesh* mMesh;
+        dtNavMeshQuery* mQuery;
+    };
+
+}
