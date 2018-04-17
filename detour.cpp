@@ -145,36 +145,24 @@ namespace NavMeshScene {
         float halfExtents[3],
         const dtQueryFilter& filter,
         uint64_t& realEndPolyRef,
-        float realEndPos[3])
+        float realEndPos[3],
+        bool& bHit)
     {
-        if (mQuery == nullptr) {
+        bHit = false;
+        if (!mQuery) {
             return false;
         }
-
         if (!GetPoly(endPos, halfExtents, filter, realEndPolyRef, realEndPos)) {
             return false;
         }
-
         if (startPolyRef == realEndPolyRef) {
             return true;
         }
-
-        float t = 0;
-        float hitNormal[3];
-        dtPolyRef polys[16];
-        int npolys = 0;
-        mQuery->raycast((dtPolyRef)startPolyRef, startPos, realEndPos, &filter,
-            &t, hitNormal, polys, &npolys, sizeof(polys) / sizeof(polys[0]));
-        if (t <= 1)
-        {
-            float hitPos[3];
-            dtVlerp(hitPos, startPos, realEndPos, t);
-            if (npolys > 0)
-            {
-                float h = 0;
-                mQuery->getPolyHeight(polys[npolys - 1], hitPos, &h);
-                hitPos[1] = h;
-            }
+        float hitPos[3];
+        if (!Raycast((dtPolyRef)startPolyRef, startPos, realEndPos, filter, bHit, hitPos)) {
+            return false;
+        }
+        if (bHit) {
             dtVcopy(realEndPos, hitPos);
         }
         return true;
@@ -187,12 +175,49 @@ namespace NavMeshScene {
         uint64_t& nearestRef,
         float nearestPt[3])
     {
+        if (!mQuery) {
+            return false;
+        }
         dtPolyRef nRef;
         dtStatus status = mQuery->findNearestPoly(pos, halfExtents, &filter, &nRef, nearestPt);
         if (dtStatusFailed(status)) {
             return false;
         }
         nearestRef = nRef;
+        return true;
+    }
+
+    bool Detour::Raycast(
+        uint64_t startPolyRef,
+        float startPos[3],
+        float endPos[3],
+        const dtQueryFilter &filter,
+        bool& bHit,
+        float hitPos[3])
+    {
+        if (!mQuery) {
+            return false;
+        }
+        float t = 0;
+        float hitNormal[3];
+        dtPolyRef polys[16];
+        int npolys = 0;
+        dtStatus status = mQuery->raycast((dtPolyRef)startPolyRef, startPos, endPos, &filter,
+            &t, hitNormal, polys, &npolys, sizeof(polys) / sizeof(polys[0]));
+        if (dtStatusFailed(status)) {
+            return false;
+        }
+        bHit = (t <= 1);
+        if (bHit)
+        {
+            dtVlerp(hitPos, startPos, endPos, t);
+            if (npolys > 0)
+            {
+                float h = 0;
+                mQuery->getPolyHeight(polys[npolys - 1], hitPos, &h);
+                hitPos[1] = h;
+            }
+        }
         return true;
     }
 

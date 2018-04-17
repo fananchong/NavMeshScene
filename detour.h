@@ -13,7 +13,7 @@ namespace NavMeshScene {
     public:
 
         Detour(uint16_t maxNode = 2048);
-        ~Detour();
+        virtual ~Detour();
 
         int Load(const char* path);
 
@@ -24,7 +24,8 @@ namespace NavMeshScene {
             float halfExtents[3],
             const dtQueryFilter& filter,
             uint64_t& realEndPolyRef,
-            float realEndPos[3]);
+            float realEndPos[3],
+            bool& bHit);
 
         bool GetPoly(
             float pos[3],
@@ -33,7 +34,15 @@ namespace NavMeshScene {
             uint64_t& nearestRef,
             float nearestPt[3]);
 
-    private:
+        bool Raycast(
+            uint64_t startPolyRef,
+            float startPos[3],
+            float endPos[3],
+            const dtQueryFilter &filter,
+            bool& bHit,
+            float hitPos[3]);
+
+    protected:
         int mMaxNode;
         dtNavMesh* mMesh;
         dtNavMeshQuery* mQuery;

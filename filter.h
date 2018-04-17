@@ -41,14 +41,14 @@ namespace NavMeshScene {
     class Filter {
     public:
         Filter();
-        ~Filter();
+        virtual ~Filter();
 
         dtQueryFilter& Get() { return *mFilter; }
         void SetAreaCost(const int i, const float cost);
         void SetIncludeFlags(const unsigned short flags);
         void SetExcludeFlags(const unsigned short flags);
 
-    private:
+    protected:
         std::unique_ptr<dtQueryFilter> mFilter;
     };
 
