@@ -4,7 +4,9 @@
 
 namespace NavMeshScene {
 
-    Scene::Scene() {
+    Scene::Scene()
+        : mDetour(new Detour(1))
+    {
 
     }
 
@@ -13,11 +15,11 @@ namespace NavMeshScene {
     }
 
     int Scene::Load(const char* path) {
-        return 0;
+        return mDetour->Load(path);
     }
 
-    void Scene::AddAgent(const std::shared_ptr<Agent>& agent) {
-
+    void Scene::AddAgent(uint64_t id, const std::shared_ptr<Agent>& agent) {
+        mAgents[id] = agent;
     }
 
     void Scene::Simulation(float delta) {

@@ -1,3 +1,6 @@
+#ifndef __NMS_SCENE_H__
+#define __NMS_SCENE_H__
+
 #include <memory>
 #include <unordered_map>
 
@@ -13,8 +16,11 @@ namespace NavMeshScene {
         ~Scene();
 
         int Load(const char* path);
-        void AddAgent(const std::shared_ptr<Agent>& agent);
+        void AddAgent(uint64_t id, const std::shared_ptr<Agent>& agent);
         void Simulation(float delta);
+
+    public:
+        inline Detour& GetDetour() { return *mDetour; }
 
     private:
         std::unique_ptr<Detour> mDetour;
@@ -22,3 +28,5 @@ namespace NavMeshScene {
     };
 
 }
+
+#endif

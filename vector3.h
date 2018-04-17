@@ -1,3 +1,6 @@
+#ifndef __NMS_VECTOR3_H__
+#define __NMS_VECTOR3_H__
+
 #include <cmath>
 
 // ДњТыеЊздЃК
@@ -313,3 +316,5 @@ namespace NavMeshScene {
     };
 
 }
+
+#endif

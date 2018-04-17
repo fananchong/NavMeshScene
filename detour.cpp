@@ -1,4 +1,7 @@
 #include "detour.h"
+#include <DetourNavMesh.h>
+#include <DetourNavMeshQuery.h>
+#include <DetourCommon.h>
 #include <cstdio>
 #include <string>
 #include <cassert>
@@ -133,6 +136,64 @@ namespace NavMeshScene {
             return 10;
         }
         return 0;
+    }
+
+    bool Detour::TryMove(
+        uint64_t startPolyRef,
+        float startPos[3],
+        float endPos[3],
+        float halfExtents[3],
+        const dtQueryFilter& filter,
+        uint64_t& realEndPolyRef,
+        float realEndPos[3])
+    {
+        if (mQuery == nullptr) {
+            return false;
+        }
+
+        if (!GetPoly(endPos, halfExtents, filter, realEndPolyRef, realEndPos)) {
+            return false;
+        }
+
+        if (startPolyRef == realEndPolyRef) {
+            return true;
+        }
+
+        float t = 0;
+        float hitNormal[3];
+        dtPolyRef polys[16];
+        int npolys = 0;
+        mQuery->raycast((dtPolyRef)startPolyRef, startPos, realEndPos, &filter,
+            &t, hitNormal, polys, &npolys, sizeof(polys) / sizeof(polys[0]));
+        if (t <= 1)
+        {
+            float hitPos[3];
+            dtVlerp(hitPos, startPos, realEndPos, t);
+            if (npolys > 0)
+            {
+                float h = 0;
+                mQuery->getPolyHeight(polys[npolys - 1], hitPos, &h);
+                hitPos[1] = h;
+            }
+            dtVcopy(realEndPos, hitPos);
+        }
+        return true;
+    }
+
+    bool Detour::GetPoly(
+        float pos[3],
+        float halfExtents[3],
+        const dtQueryFilter& filter,
+        uint64_t& nearestRef,
+        float nearestPt[3])
+    {
+        dtPolyRef nRef;
+        dtStatus status = mQuery->findNearestPoly(pos, halfExtents, &filter, &nRef, nearestPt);
+        if (dtStatusFailed(status)) {
+            return false;
+        }
+        nearestRef = nRef;
+        return true;
     }
 
 }
