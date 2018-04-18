@@ -1,4 +1,4 @@
-#include <algorithm>
+#include "helper.h"
 
 #include "SDL.h"
 #include "SDL_opengl.h"
@@ -7,13 +7,25 @@
 #else
 #	include <GL/glu.h>
 #endif
-#include "imgui.h"
-#include "imguiRenderGL.h"
+#include "RecastDemo/imgui.h"
+#include "RecastDemo/imguiRenderGL.h"
+#include "DebugUtils/Include/RecastDebugDraw.h"
+#include "DebugUtils/Include/DebugDraw.h"
+#include "RecastDemo/Sample.h"
+
+#include <algorithm>
 #include <thread>
 
-template<class T> inline T rcClamp(T v, T mn, T mx) { return v < mn ? mn : (v > mx ? mx : v); }
 
-int InitWindow() {
+const float* gBMin = 0;
+const float* gBMax = 0;
+bool gbLoad = false;
+
+int InitWindow(
+    void(*OnUpdate)(float delta),
+    void(*OnRender)(),
+    void(*OnRenderOverlay)(double* proj, double* model, int* view)) {
+
     // Init SDL
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
@@ -76,17 +88,6 @@ int InitWindow() {
         return -1;
     }
 
-    // Fog.
-    float fogColor[4] = { 0.32f, 0.31f, 0.30f, 1.0f };
-    glEnable(GL_FOG);
-    glFogi(GL_FOG_MODE, GL_LINEAR);
-    glFogf(GL_FOG_START, 1000 * 0.1f);
-    glFogf(GL_FOG_END, 1000 * 1.25f);
-    glFogfv(GL_FOG_COLOR, fogColor);
-
-    glEnable(GL_CULL_FACE);
-    glDepthFunc(GL_LEQUAL);
-
     float timeAcc = 0.0f;
     Uint32 prevFrameTime = SDL_GetTicks();
 
@@ -102,6 +103,17 @@ int InitWindow() {
 
     float scrollZoom = 0;
     bool rotate = false;
+
+    // Fog.
+    float fogColor[4] = { 0.32f, 0.31f, 0.30f, 1.0f };
+    glEnable(GL_FOG);
+    glFogi(GL_FOG_MODE, GL_LINEAR);
+    glFogf(GL_FOG_START, camr * 0.1f);
+    glFogf(GL_FOG_END, camr * 1.25f);
+    glFogfv(GL_FOG_COLOR, fogColor);
+
+    glEnable(GL_CULL_FACE);
+    glDepthFunc(GL_LEQUAL);
 
     bool done = false;
     while (!done)
@@ -194,8 +206,9 @@ int InitWindow() {
             timeAcc -= DELTA_TIME;
             if (simIter < 5)
             {
-                void OnUpdate(float delta);
-                OnUpdate(DELTA_TIME);
+                if (OnUpdate) {
+                    OnUpdate(DELTA_TIME);
+                }
             }
             simIter++;
         }
@@ -269,8 +282,9 @@ int InitWindow() {
 
         glEnable(GL_FOG);
 
-        void OnRender();
-        OnRender();
+        if (OnRender) {
+            OnRender();
+        }
 
         glDisable(GL_FOG);
 
@@ -284,9 +298,28 @@ int InitWindow() {
 
         imguiBeginFrame(mousePos[0], mousePos[1], mouseButtonMask, 0);
 
-        void OnRenderOverlay(double* proj, double* model, int* view);
-        OnRenderOverlay((double*)projectionMatrix, (double*)modelviewMatrix, (int*)viewport);
+        if (OnRenderOverlay) {
+            OnRenderOverlay((double*)projectionMatrix, (double*)modelviewMatrix, (int*)viewport);
+        }
 
+        // Reset camera and fog to match the mesh bounds.
+        if (gbLoad) {
+            gbLoad = false;
+            if (gBMin && gBMax)
+            {
+                camr = sqrtf(rcSqr(gBMax[0] - gBMin[0]) +
+                    rcSqr(gBMax[1] - gBMin[1]) +
+                    rcSqr(gBMax[2] - gBMin[2])) / 2;
+                cameraPos[0] = (gBMax[0] + gBMin[0]) / 2 + camr;
+                cameraPos[1] = (gBMax[1] + gBMin[1]) / 2 + camr;
+                cameraPos[2] = (gBMax[2] + gBMin[2]) / 2 + camr;
+                camr *= 3;
+            }
+            cameraEulers[0] = 45;
+            cameraEulers[1] = -45;
+            glFogf(GL_FOG_START, camr * 0.1f);
+            glFogf(GL_FOG_END, camr * 1.25f);
+        }
         imguiEndFrame();
         imguiRenderGLDraw();
 
@@ -299,4 +332,130 @@ int InitWindow() {
     SDL_Quit();
 
     return 0;
+}
+
+std::shared_ptr<Mesh> LoadMesh(const std::string& filepath)
+{
+    auto meshobj = std::make_shared<Mesh>();
+    if (!meshobj)
+    {
+        printf("loadMesh: Out of memory 'mesh'.\n");
+        return nullptr;
+    }
+    if (!meshobj->mesh.load(filepath))
+    {
+        printf("buildTiledNavigation: Could not load '%s'", filepath.c_str());
+        return nullptr;
+    }
+
+    rcCalcBounds(meshobj->mesh.getVerts(), meshobj->mesh.getVertCount(), meshobj->meshBoundsMin, meshobj->meshBoundsMax);
+    gbLoad = true;
+    return meshobj;
+}
+
+void RenderMesh(const std::shared_ptr<Mesh>& meshobj, float cellSize, DrawMode drawMode) {
+    glEnable(GL_FOG);
+    glDepthMask(GL_TRUE);
+
+    const float texScale = 1.0f / (cellSize * 10.0f);
+
+    SampleDebugDraw dd;
+
+    if (drawMode != DRAWMODE_NAVMESH_TRANS)
+    {
+        // Draw mesh
+        duDebugDrawTriMeshSlope(&dd, meshobj->mesh.getVerts(), meshobj->mesh.getVertCount(),
+            meshobj->mesh.getTris(), meshobj->mesh.getNormals(), meshobj->mesh.getTriCount(),
+            45, texScale);
+    }
+
+    glDisable(GL_FOG);
+    glDepthMask(GL_FALSE);
+
+    // Draw bounds
+    const float* bmin = gBMin = meshobj->meshBoundsMin;
+    const float* bmax = gBMax = meshobj->meshBoundsMax;
+    duDebugDrawBoxWire(&dd, bmin[0], bmin[1], bmin[2], bmax[0], bmax[1], bmax[2], duRGBA(255, 255, 255, 128), 1.0f);
+    dd.begin(DU_DRAW_POINTS, 5.0f);
+    dd.vertex(bmin[0], bmin[1], bmin[2], duRGBA(255, 255, 255, 128));
+    dd.end();
+
+    //if (m_navMesh && m_navQuery &&
+    //    (drawMode == DRAWMODE_NAVMESH ||
+    //        drawMode == DRAWMODE_NAVMESH_TRANS ||
+    //        drawMode == DRAWMODE_NAVMESH_BVTREE ||
+    //        drawMode == DRAWMODE_NAVMESH_NODES ||
+    //        drawMode == DRAWMODE_NAVMESH_INVIS))
+    //{
+    //    if (drawMode != DRAWMODE_NAVMESH_INVIS)
+    //        duDebugDrawNavMeshWithClosedList(&dd, *m_navMesh, *m_navQuery, m_navMeshDrawFlags);
+    //    if (drawMode == DRAWMODE_NAVMESH_BVTREE)
+    //        duDebugDrawNavMeshBVTree(&dd, *m_navMesh);
+    //    if (drawMode == DRAWMODE_NAVMESH_NODES)
+    //        duDebugDrawNavMeshNodes(&dd, *m_navQuery);
+    //    duDebugDrawNavMeshPolysWithFlags(&dd, *m_navMesh, SAMPLE_POLYFLAGS_DISABLED, duRGBA(0, 0, 0, 128));
+    //}
+
+    //glDepthMask(GL_TRUE);
+
+    //if (m_chf && drawMode == DRAWMODE_COMPACT)
+    //    duDebugDrawCompactHeightfieldSolid(&dd, *m_chf);
+
+    //if (m_chf && drawMode == DRAWMODE_COMPACT_DISTANCE)
+    //    duDebugDrawCompactHeightfieldDistance(&dd, *m_chf);
+    //if (m_chf && drawMode == DRAWMODE_COMPACT_REGIONS)
+    //    duDebugDrawCompactHeightfieldRegions(&dd, *m_chf);
+    //if (m_solid && drawMode == DRAWMODE_VOXELS)
+    //{
+    //    glEnable(GL_FOG);
+    //    duDebugDrawHeightfieldSolid(&dd, *m_solid);
+    //    glDisable(GL_FOG);
+    //}
+    //if (m_solid && drawMode == DRAWMODE_VOXELS_WALKABLE)
+    //{
+    //    glEnable(GL_FOG);
+    //    duDebugDrawHeightfieldWalkable(&dd, *m_solid);
+    //    glDisable(GL_FOG);
+    //}
+    //if (m_cset && drawMode == DRAWMODE_RAW_CONTOURS)
+    //{
+    //    glDepthMask(GL_FALSE);
+    //    duDebugDrawRawContours(&dd, *m_cset);
+    //    glDepthMask(GL_TRUE);
+    //}
+    //if (m_cset && drawMode == DRAWMODE_BOTH_CONTOURS)
+    //{
+    //    glDepthMask(GL_FALSE);
+    //    duDebugDrawRawContours(&dd, *m_cset, 0.5f);
+    //    duDebugDrawContours(&dd, *m_cset);
+    //    glDepthMask(GL_TRUE);
+    //}
+    //if (m_cset && drawMode == DRAWMODE_CONTOURS)
+    //{
+    //    glDepthMask(GL_FALSE);
+    //    duDebugDrawContours(&dd, *m_cset);
+    //    glDepthMask(GL_TRUE);
+    //}
+    //if (m_chf && m_cset && drawMode == DRAWMODE_REGION_CONNECTIONS)
+    //{
+    //    duDebugDrawCompactHeightfieldRegions(&dd, *m_chf);
+
+    //    glDepthMask(GL_FALSE);
+    //    duDebugDrawRegionConnections(&dd, *m_cset);
+    //    glDepthMask(GL_TRUE);
+    //}
+    //if (m_pmesh && drawMode == DRAWMODE_POLYMESH)
+    //{
+    //    glDepthMask(GL_FALSE);
+    //    duDebugDrawPolyMesh(&dd, *m_pmesh);
+    //    glDepthMask(GL_TRUE);
+    //}
+    //if (m_dmesh && drawMode == DRAWMODE_POLYMESH_DETAIL)
+    //{
+    //    glDepthMask(GL_FALSE);
+    //    duDebugDrawPolyMeshDetail(&dd, *m_dmesh);
+    //    glDepthMask(GL_TRUE);
+    //}
+
+    glDepthMask(GL_TRUE);
 }

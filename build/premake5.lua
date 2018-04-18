@@ -50,13 +50,22 @@ project "example2"
     includedirs {
         "../example2/Contrib/SDL/include/",
         "../example2/Contrib/",
+        "../example2/DebugUtils/Include/",
+        "../example2/Recast/Include/",
     }
     libdirs { "../bin" }
     links { "NavMeshScene" }
     files {
         "../example2/*.h",
         "../example2/*.cpp",
+        "../example2/RecastDemo/*.h",
+        "../example2/RecastDemo/*.cpp",
+        "../example2/DebugUtils/Include/*.h",
+        "../example2/DebugUtils/Source/*.cpp",
+        "../example2/Recast/Include/*.h",
+        "../example2/Recast/Source/*.cpp",
     }
+    defines{ "WIN32" }
     configuration { "windows" }
 		includedirs { "../example2/Contrib/SDL/include" }
         
