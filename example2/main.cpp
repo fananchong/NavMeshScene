@@ -15,3 +15,15 @@ int main(int argn, char *argv[]) {
 
     return 0;
 }
+
+void OnUpdate(float delta) {
+
+}
+
+void OnRender() {
+
+}
+
+void OnRenderOverlay(double* proj, double* model, int* view) {
+
+}
