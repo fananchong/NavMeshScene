@@ -19,6 +19,7 @@
 #ifndef DETOURNAVMESH_H
 #define DETOURNAVMESH_H
 
+#include <inttypes.h>
 #include "DetourAlloc.h"
 #include "DetourStatus.h"
 
@@ -53,7 +54,7 @@ typedef unsigned int dtPolyRef;
 #ifdef DT_POLYREF64
 typedef uint64_t dtTileRef;
 #else
-typedef unsigned int dtTileRef;
+typedef uint32_t dtTileRef;
 #endif
 
 /// The maximum number of vertices per navigation polygon.
@@ -314,8 +315,8 @@ struct dtNavMeshParams
 	float orig[3];					///< The world space origin of the navigation mesh's tile space. [(x, y, z)]
 	float tileWidth;				///< The width of each tile. (Along the x-axis.)
 	float tileHeight;				///< The height of each tile. (Along the z-axis.)
-	int maxTiles;					///< The maximum number of tiles the navigation mesh can contain.
-	int maxPolys;					///< The maximum number of polygons each tile can contain.
+    int32_t maxTiles;					///< The maximum number of tiles the navigation mesh can contain.
+    int32_t maxPolys;					///< The maximum number of polygons each tile can contain.
 };
 
 /// A navigation mesh based on tiles of convex polygons.

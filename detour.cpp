@@ -8,20 +8,25 @@
 
 namespace NavMeshScene {
 
+#pragma pack(1)
+
     struct NavMeshSetHeader
     {
-        int magic;
-        int version;
-        int numTiles;
+        int32_t magic;
+        int32_t version;
+        int32_t numTiles;
         dtNavMeshParams params;
     };
+
     struct NavMeshTileHeader
     {
         dtTileRef tileRef;
-        int dataSize;
+        int32_t dataSize;
     };
-    static const int NAVMESHSET_MAGIC = 'M' << 24 | 'S' << 16 | 'E' << 8 | 'T';
-    static const int NAVMESHSET_VERSION = 1;
+
+#pragma pack()
+    static const int32_t NAVMESHSET_MAGIC = 'M' << 24 | 'S' << 16 | 'E' << 8 | 'T';
+    static const int32_t NAVMESHSET_VERSION = 1;
 
 
     class FileReader {
