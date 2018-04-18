@@ -50,7 +50,15 @@ namespace NavMeshScene {
         if (mScene)
         {
             Filter& filter = mFilter ? *mFilter : mScene->GetDefaultFilter();
-            return mScene->GetDetour().TryMove(mCurPolyRef, mPosition, endPos, mHalfExtents, filter.Get(), realEndPolyRef, realEndPos, bHit);
+            return mScene->GetDetour().TryMove(
+                mCurPolyRef,
+                mPosition,
+                endPos,
+                mHalfExtents,
+                filter.Get(),
+                realEndPolyRef,
+                realEndPos,
+                bHit);
         }
         return false;
     }
@@ -60,9 +68,31 @@ namespace NavMeshScene {
             Filter& filter = mFilter ? *mFilter : mScene->GetDefaultFilter();
             mScene->GetDetour().GetPoly(v, mHalfExtents, filter.Get(), mCurPolyRef, mPosition);
         }
-        else {
-            dtVcopy(mPosition, v);
+    }
+
+    float randf()
+    {
+        return (float)(rand() / (float)RAND_MAX);
+    }
+
+    void Agent::RandomPosition() {
+        if (mScene) {
+            Filter& filter = mFilter ? *mFilter : mScene->GetDefaultFilter();
+            mScene->GetDetour().RandomPosition(&filter.Get(), randf, mCurPolyRef, mPosition);
         }
     }
 
+    bool Agent::Raycast(float endPos[3], bool& bHit, float hitPos[3]) {
+        if (mScene) {
+            Filter& filter = mFilter ? *mFilter : mScene->GetDefaultFilter();
+            return mScene->GetDetour().Raycast(
+                mCurPolyRef,
+                mPosition,
+                endPos,
+                filter.Get(),
+                bHit,
+                hitPos);
+        }
+        return false;
+    }
 }

@@ -33,14 +33,14 @@ project "NavMeshScene"
         "../Detour/**",
     }
     
-project "example"
+project "example1"
     kind "ConsoleApp"
-    targetname "example"
+    targetname "example1"
     includedirs { "../*.h" }
     libdirs { "../bin" }
     links { "NavMeshScene" }
     files {
-        "../example/*.h",
-        "../example/*.cpp",
+        "../example1/*.h",
+        "../example1/*.cpp",
     }
     

@@ -152,18 +152,27 @@ namespace NavMeshScene {
         if (!mQuery) {
             return false;
         }
-        if (!GetPoly(endPos, halfExtents, filter, realEndPolyRef, realEndPos)) {
+        dtPolyRef visited[16];
+        int nvisited = 0;
+        dtStatus status = mQuery->moveAlongSurface(
+            (dtPolyRef)startPolyRef,
+            startPos,
+            endPos,
+            &filter,
+            realEndPos,
+            visited,
+            &nvisited,
+            sizeof(visited) / sizeof(visited[0])
+        );
+        if (dtStatusFailed(status)) {
             return false;
         }
-        if (startPolyRef == realEndPolyRef) {
-            return true;
-        }
-        float hitPos[3];
-        if (!Raycast((dtPolyRef)startPolyRef, startPos, realEndPos, filter, bHit, hitPos)) {
-            return false;
-        }
-        if (bHit) {
-            dtVcopy(realEndPos, hitPos);
+        realEndPolyRef = visited[nvisited - 1];
+        if (startPolyRef == realEndPolyRef
+            && fabs(realEndPos[0] - endPos[0]) < 0.0001
+            && fabs(realEndPos[1] - endPos[1]) < 0.0001
+            && fabs(realEndPos[2] - endPos[2]) < 0.0001) {
+            bHit = true;
         }
         return true;
     }
@@ -218,6 +227,23 @@ namespace NavMeshScene {
                 hitPos[1] = h;
             }
         }
+        return true;
+    }
+
+    bool Detour::RandomPosition(const dtQueryFilter* filter,
+        float(*frand)(),
+        uint64_t& randomRef,
+        float randomPt[3])
+    {
+        if (!mQuery) {
+            return false;
+        }
+        dtPolyRef ref;
+        dtStatus status = mQuery->findRandomPoint(filter, frand, &ref, randomPt);
+        if (dtStatusFailed(status)) {
+            return false;
+        }
+        randomRef = ref;
         return true;
     }
 

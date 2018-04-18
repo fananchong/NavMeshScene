@@ -42,6 +42,12 @@ namespace NavMeshScene {
             bool& bHit,
             float hitPos[3]);
 
+        bool RandomPosition(
+            const dtQueryFilter* filter,
+            float(*frand)(),
+            uint64_t& randomRef,
+            float randomPt[3]);
+
     protected:
         int mMaxNode;
         dtNavMesh* mMesh;

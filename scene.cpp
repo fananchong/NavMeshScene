@@ -31,7 +31,6 @@ namespace NavMeshScene {
         if (id && agent) {
             mAgents[id] = agent;
             agent->SetScene(this);
-            agent->SetPosition(agent->GetPosition());
         }
     }
 
