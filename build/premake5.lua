@@ -1,7 +1,7 @@
 workspace "NavMeshScene"
     configurations { "Debug", "Release" }
     platforms { "x32", "x64" }
-    targetdir "../bin/%{cfg.buildcfg}"
+    targetdir "../bin/"
     language "C++"
     includedirs {
         "..",
@@ -36,11 +36,50 @@ project "NavMeshScene"
 project "example1"
     kind "ConsoleApp"
     targetname "example1"
-    includedirs { "../*.h" }
     libdirs { "../bin" }
     links { "NavMeshScene" }
     files {
         "../example1/*.h",
         "../example1/*.cpp",
     }
+    
+    
+project "example2"
+    kind "ConsoleApp"
+    targetname "example2"
+    includedirs {
+        "../example2/Contrib/SDL/include/",
+        "../example2/Contrib/",
+    }
+    libdirs { "../bin" }
+    links { "NavMeshScene" }
+    files {
+        "../example2/*.h",
+        "../example2/*.cpp",
+    }
+    configuration { "windows" }
+		includedirs { "../example2/Contrib/SDL/include" }
+        
+        filter { "platforms:x32" }
+            libdirs { "../example2/Contrib/SDL/lib/x86" }
+        filter { "platforms:x64" }
+            libdirs { "../example2/Contrib/SDL/lib/x64" }
+		
+		links { 
+			"glu32",
+			"opengl32",
+			"SDL2",
+			"SDL2main",
+		}
+        filter { "platforms:x32" }
+            postbuildcommands {
+                -- Copy the SDL2 dll to the Bin folder.
+                '{COPY} "%{wks.location}../example2/Contrib/SDL/lib/x86/SDL2.dll" "%{cfg.targetdir}"'
+            }
+        filter { "platforms:x64" }
+            postbuildcommands {
+                -- Copy the SDL2 dll to the Bin folder.
+                '{COPY} "%{wks.location}../example2/Contrib/SDL/lib/x64/SDL2.dll" "%{cfg.targetdir}"'
+            }
+    
     
