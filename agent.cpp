@@ -40,10 +40,10 @@ namespace NavMeshScene {
         }
         mCurPolyRef = realEndPolyRef;
         dtVcopy(mPosition, realEndPos);
-        if (bHit)
-        {
-            dtVcopy(mVelocity, ZERO);
-        }
+        //if (bHit)
+        //{
+        //    dtVcopy(mVelocity, ZERO);
+        //}
     }
 
     bool Agent::TryMove(float endPos[3], uint64_t& realEndPolyRef, float realEndPos[3], bool& bHit) {
