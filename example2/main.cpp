@@ -44,6 +44,8 @@
 #include "Sample_TempObstacles.h"
 #include "Sample_Debug.h"
 
+#include <time.h>
+
 #ifdef WIN32
 #	define snprintf _snprintf
 #	define putenv _putenv
@@ -69,8 +71,13 @@ static SampleItem g_samples[] =
 };
 static const int g_nsamples = sizeof(g_samples) / sizeof(SampleItem);
 
+string gMeshName = "Choose Mesh...";
+string gMeshesFolder = "Meshes";
+
 int main(int /*argc*/, char** /*argv*/)
 {
+    srand(unsigned int(time(0)));
+
 	// Init SDL
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
@@ -168,8 +175,6 @@ int main(int /*argc*/, char** /*argv*/)
 	string sampleName = "Choose Sample...";
 	
 	vector<string> files;
-	const string meshesFolder = "Meshes";
-	string meshName = "Choose Mesh...";
 	
 	float markerPosition[3] = {0, 0, 0};
 	bool markerPositionSet = false;
@@ -237,7 +242,7 @@ int main(int /*argc*/, char** /*argv*/)
 					{
 						if (sample && geom)
 						{
-							string savePath = meshesFolder + "/";
+							string savePath = gMeshesFolder + "/";
 							BuildSettings settings;
 							memset(&settings, 0, sizeof(settings));
 
@@ -549,7 +554,7 @@ int main(int /*argc*/, char** /*argv*/)
 			
 			imguiSeparator();
 			imguiLabel("Input Mesh");
-			if (imguiButton(meshName.c_str()))
+			if (imguiButton(gMeshName.c_str()))
 			{
 				if (showLevels)
 				{
@@ -560,8 +565,8 @@ int main(int /*argc*/, char** /*argv*/)
 					showSample = false;
 					showTestCases = false;
 					showLevels = true;
-					scanDirectory(meshesFolder, ".obj", files);
-					scanDirectoryAppend(meshesFolder, ".gset", files);
+					scanDirectory(gMeshesFolder, ".obj", files);
+					scanDirectoryAppend(gMeshesFolder, ".gset", files);
 				}
 			}
 			if (geom)
@@ -588,7 +593,7 @@ int main(int /*argc*/, char** /*argv*/)
 						showLog = true;
 						logScroll = 0;
 					}
-					ctx.dumpLog("Build log %s:", meshName.c_str());
+					ctx.dumpLog("Build log %s:", gMeshName.c_str());
 					
 					// Clear test.
 					delete test;
@@ -685,13 +690,13 @@ int main(int /*argc*/, char** /*argv*/)
 			
 			if (levelToLoad != filesEnd)
 			{
-				meshName = *levelToLoad;
+				gMeshName = *levelToLoad;
 				showLevels = false;
 				
 				delete geom;
 				geom = 0;
 				
-				string path = meshesFolder + "/" + meshName;
+				string path = gMeshesFolder + "/" + gMeshName;
 				
 				geom = new InputGeom;
 				if (!geom->load(&ctx, path))
@@ -708,7 +713,7 @@ int main(int /*argc*/, char** /*argv*/)
 					
 					showLog = true;
 					logScroll = 0;
-					ctx.dumpLog("Geom load log %s:", meshName.c_str());
+					ctx.dumpLog("Geom load log %s:", gMeshName.c_str());
 				}
 				if (sample && geom)
 				{
@@ -799,10 +804,10 @@ int main(int /*argc*/, char** /*argv*/)
 					}
 
 					// Load geom.
-					meshName = test->getGeomFileName();
+					gMeshName = test->getGeomFileName();
 					
 					
-					path = meshesFolder + "/" + meshName;
+					path = gMeshesFolder + "/" + gMeshName;
 					
 					delete geom;
 					geom = new InputGeom;
@@ -814,7 +819,7 @@ int main(int /*argc*/, char** /*argv*/)
 						sample = 0;
 						showLog = true;
 						logScroll = 0;
-						ctx.dumpLog("Geom load log %s:", meshName.c_str());
+						ctx.dumpLog("Geom load log %s:", gMeshName.c_str());
 					}
 					if (sample && geom)
 					{
@@ -828,7 +833,7 @@ int main(int /*argc*/, char** /*argv*/)
 					ctx.resetLog();
 					if (sample && !sample->handleBuild())
 					{
-						ctx.dumpLog("Build log %s:", meshName.c_str());
+						ctx.dumpLog("Build log %s:", gMeshName.c_str());
 					}
 					
 					if (geom || sample)

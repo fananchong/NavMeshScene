@@ -172,7 +172,12 @@ namespace NavMeshScene {
         if (dtStatusFailed(status)) {
             return false;
         }
+
         realEndPolyRef = visited[nvisited - 1];
+        float h = 0;
+        mQuery->getPolyHeight(realEndPolyRef, realEndPos, &h);
+        realEndPos[1] = h;
+
         if (startPolyRef == realEndPolyRef
             && fabs(realEndPos[0] - endPos[0]) < 0.0001
             && fabs(realEndPos[1] - endPos[1]) < 0.0001

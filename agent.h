@@ -5,7 +5,7 @@
 
 namespace NavMeshScene {
 
-    const float DEFAULT_HALF_EXTENTS[3] = { 2, 4, 2 };
+    const float DEFAULT_HALF_EXTENTS[3] = { 0.6f, 2.0f, 0.9f };
 
     class Filter;
     class Scene;

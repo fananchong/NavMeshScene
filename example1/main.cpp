@@ -19,7 +19,7 @@ int main(int argn, char *argv[]) {
     }
     std::cout << "load scene success!" << std::endl;
 
-    auto agent = std::make_shared< NavMeshScene::Agent>();
+    auto agent = std::make_shared<NavMeshScene::Agent>();
     scene.AddAgent(1, agent);
     agent->RandomPosition();
 

@@ -1,42 +1,72 @@
 #include "NavMeshSceneTool.h"
+#include <iostream>
+
+extern std::string gMeshName;
+extern std::string gMeshesFolder;
 
 NavMeshSceneTool::NavMeshSceneTool() : m_sample(0)
 {
+
 }
 
 void NavMeshSceneTool::init(Sample* sample)
 {
     m_sample = sample;
+    mScene = std::make_shared<NavMeshScene::Scene>();
+
+    std::string fname = gMeshesFolder + "/" + gMeshName + ".bin";
+    if (int ec = mScene->Load(fname.c_str())) {
+        std::cout << "load scene fail! errcode: " << ec << std::endl;
+        return;
+    }
+    mAgent = std::make_shared<NavMeshScene::Agent>();
+    mScene->AddAgent(1, mAgent);
+    mAgent->RandomPosition();
+
+
+    float velocity[3] = { 5,0,5 };
+    mAgent->SetVelocity(velocity);
 }
 
 void NavMeshSceneTool::handleMenu()
 {
+
 }
 
 void NavMeshSceneTool::handleClick(const float* /*s*/, const float* p, bool shift)
 {
+
 }
 
 void NavMeshSceneTool::handleStep()
 {
+
 }
 
 void NavMeshSceneTool::handleToggle()
 {
+
 }
 
-void NavMeshSceneTool::handleUpdate(const float /*dt*/)
+void NavMeshSceneTool::handleUpdate(const float dt)
 {
-
+    if (mScene) {
+        mScene->Simulation(dt);
+    }
 }
 
 void NavMeshSceneTool::reset()
 {
+
 }
 
 void NavMeshSceneTool::handleRender()
 {
-
+    if (mAgent)
+    {
+        auto pos = mAgent->GetPosition();
+        drawAgent(pos, 0.6f, 2.0f, 0.9f, duRGBA(51, 102, 0, 129));
+    }
 }
 
 void NavMeshSceneTool::handleRenderOverlay(double* proj, double* model, int* view)

@@ -81,6 +81,9 @@ void Sample_SoloMesh::cleanup()
     m_navMesh = 0;
 }
 
+extern std::string gMeshName;
+extern std::string gMeshesFolder;
+
 void Sample_SoloMesh::handleSettings()
 {
     Sample::handleCommonSettings();
@@ -93,15 +96,18 @@ void Sample_SoloMesh::handleSettings()
     imguiIndent();
     imguiIndent();
 
+
+    std::string fname = gMeshesFolder + "/" + gMeshName + ".bin";
+
     if (imguiButton("Save"))
     {
-        Sample::saveAll("solo_navmesh.bin", m_navMesh);
+        Sample::saveAll(fname.c_str(), m_navMesh);
     }
 
     if (imguiButton("Load"))
     {
         dtFreeNavMesh(m_navMesh);
-        m_navMesh = Sample::loadAll("solo_navmesh.bin");
+        m_navMesh = Sample::loadAll(fname.c_str());
         m_navQuery->init(m_navMesh, 2048);
     }
 

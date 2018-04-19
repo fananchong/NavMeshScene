@@ -1,7 +1,10 @@
 #ifndef __MYNAVMESHSCENE_H__
 #define __MYNAVMESHSCENE_H__
 
+#include <scene.h>
+#include <agent.h>
 #include <stdio.h>
+#include <memory>
 #include "Sample.h"
 
 class NavMeshSceneTool : public SampleTool
@@ -24,6 +27,9 @@ public:
 
 private:
     void drawAgent(const float* pos, float r, float h, float c, const unsigned int col);
+
+    std::shared_ptr<NavMeshScene::Scene> mScene;
+    std::shared_ptr<NavMeshScene::Agent> mAgent;
 };
 
 #endif
