@@ -52,22 +52,22 @@ project "example2"
         "../example2/Contrib/",
         "../example2/DebugUtils/Include/",
         "../example2/Recast/Include/",
+        "../example2/Detour/Include/",
+        "../example2/DetourCrowd/Include/",
+        "../example2/DetourTileCache/Include/",
+        "../example2/RecastDemo/Include/",
     }
     libdirs { "../bin" }
     links { "NavMeshScene" }
     files {
-        "../example2/*.h",
-        "../example2/*.cpp",
-        "../example2/RecastDemo/*.h",
-        "../example2/RecastDemo/*.cpp",
-        "../example2/DebugUtils/Include/*.h",
-        "../example2/DebugUtils/Source/*.cpp",
-        "../example2/Recast/Include/*.h",
-        "../example2/Recast/Source/*.cpp",
+        "../example2/**",
     }
     defines{ "WIN32" }
     configuration { "windows" }
-		includedirs { "../example2/Contrib/SDL/include" }
+		includedirs {
+            "../example2/Contrib/SDL/include",
+            "../example2/Contrib/fastlz",
+        }
         
         filter { "platforms:x32" }
             libdirs { "../example2/Contrib/SDL/lib/x86" }
