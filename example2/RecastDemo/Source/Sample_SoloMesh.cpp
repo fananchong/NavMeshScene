@@ -37,6 +37,7 @@
 #include "OffMeshConnectionTool.h"
 #include "ConvexVolumeTool.h"
 #include "CrowdTool.h"
+#include "../NavMeshSceneTool.h"
 
 #ifdef WIN32
 #	define snprintf _snprintf
@@ -138,6 +139,11 @@ void Sample_SoloMesh::handleTools()
     {
         setTool(new CrowdTool);
     }
+    if (imguiCheck("NavMeshScene", type == TOOL_MY_NAV_MESH_SCENE))
+    {
+        setTool(new NavMeshSceneTool);
+    }
+
 
     imguiSeparatorLine();
 
@@ -227,8 +233,6 @@ void Sample_SoloMesh::handleDebugMode()
         imguiValue("to see more debug mode options.");
     }
 }
-
-bool isFirst = false;
 
 void Sample_SoloMesh::handleRender()
 {
@@ -344,12 +348,6 @@ void Sample_SoloMesh::handleRender()
     renderToolStates();
 
     glDepthMask(GL_TRUE);
-
-
-    if (isFirst == false) {
-        isFirst = true;
-        handleBuild();
-    }
 }
 
 void Sample_SoloMesh::handleRenderOverlay(double* proj, double* model, int* view)
@@ -373,6 +371,8 @@ void Sample_SoloMesh::handleMeshChanged(class InputGeom* geom)
     }
     resetToolStates();
     initToolStates(this);
+
+    handleBuild();
 }
 
 
