@@ -3,6 +3,10 @@
 
 extern std::string gMeshName;
 extern std::string gMeshesFolder;
+extern float gMoveFront;
+extern float gMoveBack;
+extern float gMoveLeft;
+extern float gMoveRight;
 
 NavMeshSceneTool::NavMeshSceneTool() : m_sample(0)
 {
@@ -22,10 +26,6 @@ void NavMeshSceneTool::init(Sample* sample)
     mAgent = std::make_shared<NavMeshScene::Agent>();
     mScene->AddAgent(1, mAgent);
     mAgent->RandomPosition();
-
-
-    float velocity[3] = { 5,0,5 };
-    mAgent->SetVelocity(velocity);
 }
 
 void NavMeshSceneTool::handleMenu()
@@ -50,6 +50,8 @@ void NavMeshSceneTool::handleToggle()
 
 void NavMeshSceneTool::handleUpdate(const float dt)
 {
+    float velocity[3] = { (gMoveLeft*-1 + gMoveRight) * 5,0,(gMoveFront*-1 + gMoveBack) * 5 };
+    mAgent->SetVelocity(velocity);
     if (mScene) {
         mScene->Simulation(dt);
     }
