@@ -45,7 +45,7 @@ project "example1"
     
     
 project "example2"
-    kind "ConsoleApp"
+    kind "WindowedApp"
     targetname "example2"
     includedirs {
         "../example2/Contrib/SDL/include/",
@@ -62,18 +62,13 @@ project "example2"
     files {
         "../example2/**",
     }
-    defines{ "WIN32" }
+    defines { "WIN32", "_WINDOWS", "_CRT_SECURE_NO_WARNINGS", "_HAS_EXCEPTIONS=0" }
     configuration { "windows" }
 		includedirs {
             "../example2/Contrib/SDL/include",
             "../example2/Contrib/fastlz",
         }
         
-        filter { "platforms:x32" }
-            libdirs { "../example2/Contrib/SDL/lib/x86" }
-        filter { "platforms:x64" }
-            libdirs { "../example2/Contrib/SDL/lib/x64" }
-		
 		links { 
 			"glu32",
 			"opengl32",
@@ -81,11 +76,13 @@ project "example2"
 			"SDL2main",
 		}
         filter { "platforms:x32" }
+            libdirs { "../example2/Contrib/SDL/lib/x86" }
             postbuildcommands {
                 -- Copy the SDL2 dll to the Bin folder.
                 '{COPY} "%{wks.location}../example2/Contrib/SDL/lib/x86/SDL2.dll" "%{cfg.targetdir}"'
             }
         filter { "platforms:x64" }
+            libdirs { "../example2/Contrib/SDL/lib/x64" }
             postbuildcommands {
                 -- Copy the SDL2 dll to the Bin folder.
                 '{COPY} "%{wks.location}../example2/Contrib/SDL/lib/x64/SDL2.dll" "%{cfg.targetdir}"'
