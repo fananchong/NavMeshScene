@@ -8,6 +8,8 @@
 
 namespace NavMeshScene {
 
+    std::unordered_map<std::string, dtNavMesh*> Detour::mStaticMesh;
+
 #pragma pack(1)
 
     struct NavMeshSetHeader
@@ -53,8 +55,9 @@ namespace NavMeshScene {
         FILE* fp;
     };
 
-    Detour::Detour(uint16_t maxNode)
-        : mMaxNode(maxNode)
+    Detour::Detour(bool bStaticMesh, uint16_t maxNode)
+        : mbStaticMesh(bStaticMesh)
+        , mMaxNode(maxNode)
         , mMesh(nullptr)
         , mQuery(nullptr)
     {
@@ -73,9 +76,49 @@ namespace NavMeshScene {
     }
 
     int Detour::Load(const char*path) {
+        int errCode = 0;
+        dtNavMesh* mesh = nullptr;
+        if (mbStaticMesh)
+        {
+            auto it = Detour::mStaticMesh.find(path);
+            if (it != Detour::mStaticMesh.end()) {
+                mesh = it->second;
+            }
+            else {
+                mesh = loadDetail(path, errCode);
+                if (!errCode)
+                {
+                    Detour::mStaticMesh[path] = mesh;
+                }
+            }
+        }
+        else {
+            mMesh = mesh = loadDetail(path, errCode);
+        }
+
+        if (errCode)
+        {
+            return errCode;
+        }
+
+        mQuery = dtAllocNavMeshQuery();
+        if (!mQuery) {
+            return 9;
+        }
+
+        dtStatus status = mQuery->init(mesh, mMaxNode);
+        if (dtStatusFailed(status)) {
+            return 10;
+        }
+        return 0;
+    }
+
+    dtNavMesh* Detour::loadDetail(const char*path, int& errCode) {
+        errCode = 0;
         FileReader fp(path);
         if (fp == 0) {
-            return 1;
+            errCode = 1;
+            return nullptr;
         }
 
         // Read header.
@@ -83,26 +126,31 @@ namespace NavMeshScene {
         size_t readLen = fread(&header, sizeof(NavMeshSetHeader), 1, fp);
         if (readLen != 1)
         {
-            return 2;
+            errCode = 2;
+            return nullptr;
         }
         if (header.magic != NAVMESHSET_MAGIC)
         {
-            return 3;
+            errCode = 3;
+            return nullptr;
         }
         if (header.version != NAVMESHSET_VERSION)
         {
-            return 4;
+            errCode = 4;
+            return nullptr;
         }
 
         dtNavMesh* mesh = dtAllocNavMesh();
         if (!mesh)
         {
-            return 5;
+            errCode = 5;
+            return nullptr;
         }
         dtStatus status = mesh->init(&header.params);
         if (dtStatusFailed(status))
         {
-            return 6;
+            errCode = 6;
+            return nullptr;
         }
 
         // Read tiles.
@@ -112,7 +160,8 @@ namespace NavMeshScene {
             readLen = fread(&tileHeader, sizeof(tileHeader), 1, fp);
             if (readLen != 1)
             {
-                return 7;
+                errCode = 7;
+                return nullptr;
             }
 
             if (!tileHeader.tileRef || !tileHeader.dataSize)
@@ -125,22 +174,13 @@ namespace NavMeshScene {
             if (readLen != 1)
             {
                 dtFree(data);
-                return 8;
+                errCode = 8;
+                return nullptr;
             }
 
             mesh->addTile(data, tileHeader.dataSize, DT_TILE_FREE_DATA, tileHeader.tileRef, 0);
         }
-
-        mQuery = dtAllocNavMeshQuery();
-        if (!mQuery) {
-            return 9;
-        }
-
-        status = mQuery->init(mesh, mMaxNode);
-        if (dtStatusFailed(status)) {
-            return 10;
-        }
-        return 0;
+        return mesh;
     }
 
     bool Detour::TryMove(
@@ -175,7 +215,7 @@ namespace NavMeshScene {
 
         realEndPolyRef = visited[nvisited - 1];
         float h = 0;
-        mQuery->getPolyHeight(realEndPolyRef, realEndPos, &h);
+        mQuery->getPolyHeight((dtPolyRef)realEndPolyRef, realEndPos, &h);
         realEndPos[1] = h;
 
         if (startPolyRef == realEndPolyRef && dtVequal(realEndPos, endPos)) {

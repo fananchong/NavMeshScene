@@ -13,7 +13,7 @@ namespace NavMeshScene {
     class Scene {
     public:
 
-        Scene();
+        Scene(bool bStatic);
         virtual ~Scene();
 
         int Load(const char* path);
@@ -30,6 +30,9 @@ namespace NavMeshScene {
         std::unordered_map<uint64_t, std::shared_ptr<Agent>> mAgents;
         std::unique_ptr<Filter> mDefaultFilter;
     };
+
+    class StaticScene : public Scene { public: StaticScene() :Scene(true) {} };
+
 
 }
 

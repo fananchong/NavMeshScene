@@ -12,7 +12,7 @@ int main(int argn, char *argv[]) {
 
     srand(unsigned int(time(0)));
 
-    NavMeshScene::Scene scene;
+    NavMeshScene::StaticScene scene;
     if (int ec = scene.Load(argv[1])) {
         std::cout << "load scene fail! errcode: " << ec << std::endl;
         return 1;

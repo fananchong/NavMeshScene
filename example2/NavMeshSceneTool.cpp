@@ -17,7 +17,7 @@ NavMeshSceneTool::NavMeshSceneTool() : m_sample(0)
 void NavMeshSceneTool::init(Sample* sample)
 {
     m_sample = sample;
-    mScene = std::make_shared<NavMeshScene::Scene>();
+    mScene = std::make_shared<NavMeshScene::StaticScene>();
 
     std::string fname = gMeshesFolder + "/" + gMeshName + ".bin";
     if (int ec = mScene->Load(fname.c_str())) {

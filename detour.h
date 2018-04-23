@@ -2,6 +2,7 @@
 #define __NMS_DETOUR_H__
 
 #include <cstdint>
+#include <unordered_map>
 
 class dtNavMesh;
 class dtNavMeshQuery;
@@ -12,7 +13,7 @@ namespace NavMeshScene {
     class Detour {
     public:
 
-        Detour(uint16_t maxNode = 2048);
+        Detour(bool bStaticMesh = true, uint16_t maxNode = 2048);
         virtual ~Detour();
 
         int Load(const char* path);
@@ -49,9 +50,13 @@ namespace NavMeshScene {
             float randomPt[3]);
 
     protected:
+        dtNavMesh* loadDetail(const char*path, int& errCode);
+
+        bool mbStaticMesh;
         int mMaxNode;
         dtNavMesh* mMesh;
         dtNavMeshQuery* mQuery;
+        static std::unordered_map<std::string, dtNavMesh*> mStaticMesh;
     };
 
 }

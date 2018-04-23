@@ -5,8 +5,8 @@
 
 namespace NavMeshScene {
 
-    Scene::Scene()
-        : mDetour(new Detour(16))
+    Scene::Scene(bool bStatic)
+        : mDetour(new Detour(bStatic, 16))
         , mDefaultFilter(new Filter())
     {
 
