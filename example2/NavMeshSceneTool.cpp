@@ -61,7 +61,7 @@ void NavMeshSceneTool::handleUpdate(const float dt)
         return;
     }
 
-    float velocity[3] = { (gMoveLeft*-1 + gMoveRight) * 5,0,(gMoveFront*-1 + gMoveBack) * 5 };
+    float velocity[3] = { (gMoveLeft*-1 + gMoveRight) * 3,0,(gMoveFront*-1 + gMoveBack) * 3 };
     mAgent->SetVelocity(velocity);
     mScene->Simulation(dt);
 }

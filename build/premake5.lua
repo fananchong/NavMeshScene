@@ -45,7 +45,7 @@ project "example1"
     
     
 project "example2"
-    kind "WindowedApp"
+    kind "ConsoleApp"
     targetname "example2"
     includedirs {
         "../example2/Contrib/SDL/include/",
