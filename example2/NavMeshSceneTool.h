@@ -27,9 +27,11 @@ public:
 
 private:
     void drawAgent(const float* pos, float r, float h, float c, const unsigned int col);
+    void doInit();
 
     std::shared_ptr<NavMeshScene::Scene> mScene;
     std::shared_ptr<NavMeshScene::Agent> mAgent;
+    int mMeshMode;
 };
 
 #endif

@@ -2,6 +2,7 @@
 #include "agent.h"
 #include "detour.h"
 #include "filter.h"
+#include <DetourTileCache.h>
 
 namespace NavMeshScene {
 
@@ -21,6 +22,9 @@ namespace NavMeshScene {
     }
 
     void Scene::Simulation(float delta) {
+        if (mDetour->GetTileCache()) {
+            mDetour->GetTileCache()->update(delta, mDetour->GetMesh());
+        }
         for (auto it = mAgents.begin(); it != mAgents.end(); it++) {
             auto &agent = it->second;
             agent->Update(delta);
@@ -39,6 +43,33 @@ namespace NavMeshScene {
         if (it != mAgents.end()) {
             mAgents.erase(it);
         }
+    }
+
+
+    DynamicScene::DynamicScene(int heightMode)
+        : Scene(false)
+    {
+        mDetour->SetHeightMode(heightMode);
+    }
+
+    DynamicScene::~DynamicScene() {
+
+    }
+
+    unsigned int DynamicScene::AddCapsuleObstacle(const float pos[3], const float radius, const float height) {
+        return mDetour->AddCapsuleObstacle(pos, radius, height);
+    }
+
+    unsigned int DynamicScene::AddBoxObstacle(const float bmin[3], const float bmax[3]) {
+        return mDetour->AddBoxObstacle(bmin, bmax);
+    }
+
+    unsigned int DynamicScene::AddBoxObstacle(const float center[3], const float halfExtents[3], const float yRadians) {
+        return mDetour->AddBoxObstacle(center, halfExtents, yRadians);
+    }
+
+    void DynamicScene::RemoveObstacle(unsigned int obstacleId) {
+        mDetour->RemoveObstacle(obstacleId);
     }
 
 }

@@ -78,7 +78,7 @@ namespace NavMeshScene {
     void Agent::RandomPosition() {
         if (mScene) {
             Filter& filter = mFilter ? *mFilter : mScene->GetDefaultFilter();
-            mScene->GetDetour().RandomPosition(&filter.Get(), randf, mCurPolyRef, mPosition);
+            mScene->GetDetour().RandomPosition(mHalfExtents, &filter.Get(), randf, mCurPolyRef, mPosition);
         }
     }
 

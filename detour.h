@@ -7,8 +7,13 @@
 class dtNavMesh;
 class dtNavMeshQuery;
 class dtQueryFilter;
+class dtTileCache;
 
 namespace NavMeshScene {
+
+    class LinearAllocator;
+    class FastLZCompressor;
+    class MeshProcess;
 
     class Detour {
     public:
@@ -44,18 +49,38 @@ namespace NavMeshScene {
             float hitPos[3]);
 
         bool RandomPosition(
+            float halfExtents[3],
             const dtQueryFilter* filter,
             float(*frand)(),
             uint64_t& randomRef,
             float randomPt[3]);
 
+        inline void SetHeightMode(int heightMode) { mHeightMode = heightMode; }
+        unsigned int AddCapsuleObstacle(const float pos[3], const float radius, const float height);
+        unsigned int AddBoxObstacle(const float bmin[3], const float bmax[3]);
+        unsigned int AddBoxObstacle(const float center[3], const float halfExtents[3], const float yRadians);
+        void RemoveObstacle(unsigned int obstacleId);
+
+
+    public:
+        inline dtTileCache* GetTileCache() { return mTileCache; }
+        inline dtNavMesh* GetMesh() { return mMesh; }
+
     protected:
-        dtNavMesh* loadDetail(const char*path, int& errCode);
+        dtNavMesh* loadStaticMesh(const char*path, int& errCode);
+        dtNavMesh* loadDynamicMesh(const char*path, int& errCode);
+        dtNavMesh* createStaticMesh(const char*path, int& errCode);
 
         bool mbStaticMesh;
         int mMaxNode;
         dtNavMesh* mMesh;
+        dtTileCache* mTileCache;
         dtNavMeshQuery* mQuery;
+        int mHeightMode;
+        LinearAllocator* mTalloc;
+        FastLZCompressor* mTcomp;
+        MeshProcess* mTmproc;
+        dtNavMeshQuery* mQueryForHeightMode2;
         static std::unordered_map<std::string, dtNavMesh*> mStaticMesh;
     };
 

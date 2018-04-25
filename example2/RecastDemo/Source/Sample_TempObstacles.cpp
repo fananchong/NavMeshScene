@@ -852,6 +852,9 @@ Sample_TempObstacles::~Sample_TempObstacles()
     dtFreeTileCache(m_tileCache);
 }
 
+extern std::string gMeshName;
+extern std::string gMeshesFolder;
+
 void Sample_TempObstacles::handleSettings()
 {
     Sample::handleCommonSettings();
@@ -919,16 +922,18 @@ void Sample_TempObstacles::handleSettings()
     imguiIndent();
     imguiIndent();
 
+    std::string fname = gMeshesFolder + "/" + gMeshName + ".tilecache.bin";
+
     if (imguiButton("Save"))
     {
-        saveAll("all_tiles_tilecache.bin");
+        saveAll(fname.c_str());
     }
 
     if (imguiButton("Load"))
     {
         dtFreeNavMesh(m_navMesh);
         dtFreeTileCache(m_tileCache);
-        loadAll("all_tiles_tilecache.bin");
+        loadAll(fname.c_str());
         m_navQuery->init(m_navMesh, 2048);
     }
 
@@ -1159,6 +1164,8 @@ void Sample_TempObstacles::handleMeshChanged(class InputGeom* geom)
     }
     resetToolStates();
     initToolStates(this);
+
+    //handleBuild();
 }
 
 void Sample_TempObstacles::addTempObstacle(const float* pos)

@@ -6,6 +6,8 @@ workspace "NavMeshScene"
     includedirs {
         "..",
         "../Detour/Include",
+        "../DetourTileCache/Include",
+        "../Contrib/fastlz",
     }
     flags {
         "C++11",
@@ -31,6 +33,8 @@ project "NavMeshScene"
         "../*.h",
         "../*.cpp",
         "../Detour/**",
+        "../DetourTileCache/**",
+        "../Contrib/fastlz/**",
     }
     
 project "example1"
@@ -52,9 +56,9 @@ project "example2"
         "../example2/Contrib/",
         "../example2/DebugUtils/Include/",
         "../example2/Recast/Include/",
-        "../example2/Detour/Include/",
+        -- "../example2/Detour/Include/",
         "../example2/DetourCrowd/Include/",
-        "../example2/DetourTileCache/Include/",
+        -- "../example2/DetourTileCache/Include/",
         "../example2/RecastDemo/Include/",
     }
     libdirs { "../bin" }
@@ -66,7 +70,7 @@ project "example2"
     configuration { "windows" }
 		includedirs {
             "../example2/Contrib/SDL/include",
-            "../example2/Contrib/fastlz",
+            -- "../example2/Contrib/fastlz",
         }
         
 		links { 
@@ -87,5 +91,4 @@ project "example2"
                 -- Copy the SDL2 dll to the Bin folder.
                 '{COPY} "%{wks.location}../example2/Contrib/SDL/lib/x64/SDL2.dll" "%{cfg.targetdir}"'
             }
-    
     
