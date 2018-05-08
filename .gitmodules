@@ -1,0 +1,3 @@
+[submodule "aoi"]
+	path = aoi
+	url = https://github.com/fananchong/aoi
