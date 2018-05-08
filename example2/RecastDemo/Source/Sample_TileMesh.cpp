@@ -228,12 +228,20 @@ void Sample_TileMesh::cleanup()
 static const int32_t NAVMESHSET_MAGIC = 'M' << 24 | 'S' << 16 | 'E' << 8 | 'T'; //'MSET';
 static const int32_t NAVMESHSET_VERSION = 1;
 
+#pragma pack(push, 1)
+
 struct NavMeshSetHeader
 {
     int32_t magic;
     int32_t version;
     int32_t numTiles;
     dtNavMeshParams params;
+    float boundsMinX;
+    float boundsMinY;
+    float boundsMinZ;
+    float boundsMaxX;
+    float boundsMaxY;
+    float boundsMaxZ;
 };
 
 struct NavMeshTileHeader
@@ -241,6 +249,8 @@ struct NavMeshTileHeader
     dtTileRef tileRef;
     int32_t dataSize;
 };
+
+#pragma pack(pop)
 
 extern std::string gMeshName;
 extern std::string gMeshesFolder;

@@ -30,8 +30,7 @@ namespace NavMeshScene {
             float halfExtents[3],
             const dtQueryFilter& filter,
             uint64_t& realEndPolyRef,
-            float realEndPos[3],
-            bool& bHit);
+            float realEndPos[3]);
 
         bool GetPoly(
             float pos[3],
@@ -61,6 +60,8 @@ namespace NavMeshScene {
         unsigned int AddBoxObstacle(const float center[3], const float halfExtents[3], const float yRadians);
         void RemoveObstacle(unsigned int obstacleId);
 
+        float* GetBoundsMin() { return mBoundsMin; }
+        float* GetBoundsMax() { return mBoundsMax; }
 
     public:
         inline dtTileCache* GetTileCache() { return mTileCache; }
@@ -76,6 +77,10 @@ namespace NavMeshScene {
         dtNavMesh* mMesh;
         dtTileCache* mTileCache;
         dtNavMeshQuery* mQuery;
+
+        float mBoundsMin[3];
+        float mBoundsMax[3];
+
         int mHeightMode;
         LinearAllocator* mTalloc;
         FastLZCompressor* mTcomp;

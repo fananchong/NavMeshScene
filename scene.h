@@ -3,14 +3,21 @@
 
 #include <memory>
 #include <unordered_map>
+#include <aoi/aoi.h>
+
+namespace NavMeshScene {
+    class Agent;
+}
+
+typedef aoi::Scene<NavMeshScene::Agent, 16> AOISceneType;
 
 namespace NavMeshScene {
 
-    class Agent;
     class Detour;
     class Filter;
 
-    class Scene {
+    class Scene : public AOISceneType
+    {
     public:
 
         Scene(bool bStatic);
@@ -43,9 +50,8 @@ namespace NavMeshScene {
         virtual ~DynamicScene();
 
         enum {
-            HEIGHT_MODE_1 = 1,   // 原始的，精度不是很高，但是没多余消耗。
+            HEIGHT_MODE_1 = 1,   // 原始的，精度不是很高，但是没多余消耗。可以通过使Tile Size变小来提高精度
             HEIGHT_MODE_2 = 2,   // 通过公共的StaticScene上，获取精确高度值。
-            HEIGHT_MODE_3 = 3,   // DynamicScene构建时，以及地形发生变化时，触发构建`精确高度信息`
         };
 
         unsigned int AddCapsuleObstacle(const float pos[3], const float radius, const float height);

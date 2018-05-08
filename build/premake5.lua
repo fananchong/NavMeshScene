@@ -35,6 +35,8 @@ project "NavMeshScene"
         "../Detour/**",
         "../DetourTileCache/**",
         "../Contrib/fastlz/**",
+        "../aoi/impl/*.h",
+        "../aoi/*.h",
     }
     
 project "example1"

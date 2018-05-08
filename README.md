@@ -1,5 +1,10 @@
 # NavMeshScene
 
+## 更新submodules
+
+```bash
+git submodule update --init -- "aoi"
+```
 
 ## 使用示例
 

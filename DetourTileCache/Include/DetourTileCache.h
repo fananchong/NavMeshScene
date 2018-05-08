@@ -82,6 +82,8 @@ struct dtTileCacheObstacle
 	dtTileCacheObstacle* next;
 };
 
+#pragma pack(push, 1)
+
 struct dtTileCacheParams
 {
 	float orig[3];
@@ -94,6 +96,8 @@ struct dtTileCacheParams
     int32_t maxTiles;
     int32_t maxObstacles;
 };
+
+#pragma pack(pop)
 
 struct dtTileCacheMeshProcess
 {

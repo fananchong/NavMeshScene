@@ -15,6 +15,7 @@ extern float gMoveRight;
 NavMeshSceneTool::NavMeshSceneTool()
     : m_sample(0)
     , mMeshMode(0)
+    , mCurrentAgent(-1)
 {
 
 }
@@ -39,9 +40,26 @@ void NavMeshSceneTool::doInit() {
         std::cout << "load scene fail! errcode: " << ec << std::endl;
         return;
     }
-    mAgent = std::make_shared<NavMeshScene::Agent>();
-    mScene->AddAgent(1, mAgent);
-    mAgent->RandomPosition();
+
+    for (size_t i = 0; i < mAgents.size(); i++)
+    {
+        mScene->RemoveAgent(mAgents[i]->GetId());
+    }
+    mAgents.clear();
+    for (size_t i = 0; i < 100; i++)
+    {
+        auto agent = std::make_shared<Player>();
+        mAgents.push_back(agent);
+        mScene->AddAgent(i + 1, agent);
+        agent->RandomPosition();
+        agent->changeDir();
+    }
+    if (mCurrentAgent >= 0)
+    {
+        mAgents[mCurrentAgent]->mRobot = true;
+    }
+    mCurrentAgent = int(mAgents.size() - 1);
+    mAgents[mCurrentAgent]->mRobot = false;
 }
 
 void NavMeshSceneTool::handleMenu()
@@ -64,20 +82,11 @@ void NavMeshSceneTool::handleMenu()
         doInit();
     }
 
-    if (imguiCheck("Dynamic Scene(height mode: 3)", mMeshMode == 3))
-    {
-        mMeshMode = 3;
-        doInit();
-    }
-
     imguiSeparator();
 
-    if (imguiButton("Random Postion"))
+    if (imguiButton("Select Agent"))
     {
-        if (mAgent)
-        {
-            mAgent->RandomPosition();
-        }
+        mCurrentAgent = rand() % mAgents.size();
     }
 }
 
@@ -115,12 +124,12 @@ void NavMeshSceneTool::handleToggle()
 
 void NavMeshSceneTool::handleUpdate(const float dt)
 {
-    if (!mScene || !mAgent) {
+    if (!mScene || mCurrentAgent < 0) {
         return;
     }
 
     float velocity[3] = { (gMoveLeft*-1 + gMoveRight) * 3,0,(gMoveFront*-1 + gMoveBack) * 3 };
-    mAgent->SetVelocity(velocity);
+    mAgents[mCurrentAgent]->SetVelocity(velocity);
     mScene->Simulation(dt);
 }
 
@@ -137,10 +146,15 @@ void NavMeshSceneTool::handleRender()
         drawObstacles(&m_sample->getDebugDraw(), scn->GetDetour().GetTileCache());
     }
 
-    if (mAgent)
+    for (size_t i = 0; i < mAgents.size(); i++)
     {
-        auto pos = mAgent->GetPosition();
-        drawAgent(pos, 0.6f, 2.0f, 0.9f, duRGBA(51, 102, 0, 129));
+        auto color = duRGBA(51, 102, 0, 129);
+        if (i == mCurrentAgent)
+        {
+            color = duRGBA(128, 25, 0, 192);
+        }
+        auto pos = mAgents[i]->GetPosition();
+        drawAgent(pos, 0.6f, 2.0f, 0.9f, color);
     }
 }
 

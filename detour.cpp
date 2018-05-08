@@ -13,7 +13,7 @@ namespace NavMeshScene {
 
     std::unordered_map<std::string, dtNavMesh*> Detour::mStaticMesh;
 
-#pragma pack(1)
+#pragma pack(push, 1)
 
     struct NavMeshSetHeader
     {
@@ -21,6 +21,12 @@ namespace NavMeshScene {
         int32_t version;
         int32_t numTiles;
         dtNavMeshParams params;
+        float boundsMinX;
+        float boundsMinY;
+        float boundsMinZ;
+        float boundsMaxX;
+        float boundsMaxY;
+        float boundsMaxZ;
     };
 
     struct NavMeshTileHeader
@@ -36,6 +42,12 @@ namespace NavMeshScene {
         int32_t numTiles;
         dtNavMeshParams meshParams;
         dtTileCacheParams cacheParams;
+        float boundsMinX;
+        float boundsMinY;
+        float boundsMinZ;
+        float boundsMaxX;
+        float boundsMaxY;
+        float boundsMaxZ;
     };
 
     struct TileCacheTileHeader
@@ -44,7 +56,7 @@ namespace NavMeshScene {
         int32_t dataSize;
     };
 
-#pragma pack()
+#pragma pack(pop)
 
     static const int32_t NAVMESHSET_MAGIC = 'M' << 24 | 'S' << 16 | 'E' << 8 | 'T';
     static const int32_t NAVMESHSET_VERSION = 1;
@@ -222,6 +234,13 @@ namespace NavMeshScene {
             return nullptr;
         }
 
+        mBoundsMin[0] = header.boundsMinX;
+        mBoundsMin[1] = header.boundsMinY;
+        mBoundsMin[2] = header.boundsMinZ;
+        mBoundsMax[0] = header.boundsMaxX;
+        mBoundsMax[1] = header.boundsMaxY;
+        mBoundsMax[2] = header.boundsMaxZ;
+
         dtNavMesh* mesh = dtAllocNavMesh();
         if (!mesh)
         {
@@ -295,6 +314,13 @@ namespace NavMeshScene {
             errCode = 204;
             return nullptr;
         }
+
+        mBoundsMin[0] = header.boundsMinX;
+        mBoundsMin[1] = header.boundsMinY;
+        mBoundsMin[2] = header.boundsMinZ;
+        mBoundsMax[0] = header.boundsMaxX;
+        mBoundsMax[1] = header.boundsMaxY;
+        mBoundsMax[2] = header.boundsMaxZ;
 
         mMesh = dtAllocNavMesh();
         if (!mMesh)
@@ -379,10 +405,8 @@ namespace NavMeshScene {
         float halfExtents[3],
         const dtQueryFilter& filter,
         uint64_t& realEndPolyRef,
-        float realEndPos[3],
-        bool& bHit)
+        float realEndPos[3])
     {
-        bHit = false;
         if (!mQuery) {
             return false;
         }
@@ -434,10 +458,6 @@ namespace NavMeshScene {
             float tempPos[3];
             mQueryForHeightMode2->findNearestPoly(realEndPos, halfExtents, &filter, &tempRef, tempPos);
             realEndPos[1] = tempPos[1];
-        }
-
-        if (startPolyRef == realEndPolyRef && dtVequal(realEndPos, endPos)) {
-            bHit = true;
         }
         return true;
     }

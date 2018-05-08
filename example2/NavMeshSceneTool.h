@@ -7,6 +7,48 @@
 #include <memory>
 #include "Sample.h"
 
+class Player : public NavMeshScene::Agent
+{
+public:
+
+    void OnHitAgent(Agent* agent) override
+    {
+        if (!mRobot)
+        {
+            return;
+        }
+        changeDir();
+    }
+
+    void Update(float delta) override
+    {
+        NavMeshScene::Agent::Update(delta);
+
+        if (!mRobot)
+        {
+            return;
+        }
+
+        auto v = GetVelocity();
+        if (v[0] = 0 && v[1] == 0 && v[2] == 0)
+        {
+            changeDir();
+        }
+    }
+
+public:
+
+    void changeDir()
+    {
+        float vx = float((rand() % 6 + 3) * (rand() % 2 == 0 ? 1 : -1));
+        float vy = float((rand() % 6 + 3) * (rand() % 2 == 0 ? 1 : -1));
+        float v[3] = { vx,0, vy };
+        SetVelocity(v);
+    }
+
+    bool mRobot = true;
+};
+
 class NavMeshSceneTool : public SampleTool
 {
     Sample* m_sample;
@@ -30,8 +72,9 @@ private:
     void doInit();
 
     std::shared_ptr<NavMeshScene::Scene> mScene;
-    std::shared_ptr<NavMeshScene::Agent> mAgent;
+    std::vector<std::shared_ptr<Player>> mAgents;
     int mMeshMode;
+    int mCurrentAgent;
 };
 
 #endif

@@ -7,7 +7,8 @@
 namespace NavMeshScene {
 
     Scene::Scene(bool bStatic)
-        : mDetour(new Detour(bStatic, 16))
+        : AOISceneType()
+        , mDetour(new Detour(bStatic, 16))
         , mDefaultFilter(new Filter())
     {
 
@@ -18,7 +19,16 @@ namespace NavMeshScene {
     }
 
     int Scene::Load(const char* path) {
-        return mDetour->Load(path);
+        int retCode = mDetour->Load(path);
+        if (!retCode)
+        {
+            float* bmin = mDetour->GetBoundsMin();
+            float* bmax = mDetour->GetBoundsMax();
+            printf("bounds min:(%f, %f, %f)\n", bmin[0], bmin[1], bmin[2]);
+            printf("bounds max:(%f, %f, %f)\n", bmax[0], bmax[1], bmax[2]);
+            SetBounds(aoi::Rect(bmin[0], bmax[0], bmin[2], bmax[2]));
+        }
+        return retCode;
     }
 
     void Scene::Simulation(float delta) {
@@ -33,6 +43,7 @@ namespace NavMeshScene {
 
     void Scene::AddAgent(uint64_t id, const std::shared_ptr<Agent>& agent) {
         if (id && agent) {
+            agent->SetId(id);
             mAgents[id] = agent;
             agent->SetScene(this);
         }
@@ -41,6 +52,7 @@ namespace NavMeshScene {
     void Scene::RemoveAgent(uint64_t id) {
         auto it = mAgents.find(id);
         if (it != mAgents.end()) {
+            Remove(it->second.get());
             mAgents.erase(it);
         }
     }

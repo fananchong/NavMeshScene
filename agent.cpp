@@ -10,7 +10,8 @@ namespace NavMeshScene {
     const float ZERO[3] = { 0,0,0 };
 
     Agent::Agent()
-        : mScene(nullptr)
+        : mId(0)
+        , mScene(nullptr)
         , mFilter(nullptr)
         , mCurPolyRef(0)
     {
@@ -32,21 +33,29 @@ namespace NavMeshScene {
             mPosition[1] + mVelocity[1] * delta,
             mPosition[2] + mVelocity[2] * delta
         };
+        if (auto agent = checkPosByAOI(mPosition[0], mPosition[2], endPos[0], endPos[2], true))
+        {
+            // ֹͣ
+            dtVcopy(mVelocity, ZERO);
+            OnHitAgent(agent);
+            return;
+        }
         uint64_t realEndPolyRef;
         float realEndPos[3];
-        bool bHit;
-        if (!TryMove(endPos, realEndPolyRef, realEndPos, bHit)) {
+        if (!TryMove(endPos, realEndPolyRef, realEndPos)) {
             return;
         }
         mCurPolyRef = realEndPolyRef;
         dtVcopy(mPosition, realEndPos);
-        //if (bHit)
-        //{
-        //    dtVcopy(mVelocity, ZERO);
-        //}
+        if (fabs(X - mPosition[0]) >= FLT_EPSILON || fabs(Y - mPosition[2]) >= FLT_EPSILON)
+        {
+            X = mPosition[0];
+            Y = mPosition[2];
+            mScene->Update(this);
+        }
     }
 
-    bool Agent::TryMove(float endPos[3], uint64_t& realEndPolyRef, float realEndPos[3], bool& bHit) {
+    bool Agent::TryMove(float endPos[3], uint64_t& realEndPolyRef, float realEndPos[3]) {
         if (mScene)
         {
             Filter& filter = mFilter ? *mFilter : mScene->GetDefaultFilter();
@@ -57,8 +66,7 @@ namespace NavMeshScene {
                 mHalfExtents,
                 filter.Get(),
                 realEndPolyRef,
-                realEndPos,
-                bHit);
+                realEndPos);
         }
         return false;
     }
@@ -67,6 +75,9 @@ namespace NavMeshScene {
         if (mScene) {
             Filter& filter = mFilter ? *mFilter : mScene->GetDefaultFilter();
             mScene->GetDetour().GetPoly(v, mHalfExtents, filter.Get(), mCurPolyRef, mPosition);
+            X = mPosition[0];
+            Y = mPosition[2];
+            mScene->Update(this);
         }
     }
 
@@ -78,7 +89,15 @@ namespace NavMeshScene {
     void Agent::RandomPosition() {
         if (mScene) {
             Filter& filter = mFilter ? *mFilter : mScene->GetDefaultFilter();
+        LABLE_RANDOM:
             mScene->GetDetour().RandomPosition(mHalfExtents, &filter.Get(), randf, mCurPolyRef, mPosition);
+            if (checkPosByAOI(mPosition[0], mPosition[2], mPosition[0], mPosition[2], false))
+            {
+                goto LABLE_RANDOM;
+            }
+            X = mPosition[0];
+            Y = mPosition[2];
+            mScene->Update(this);
         }
     }
 
@@ -94,5 +113,41 @@ namespace NavMeshScene {
                 hitPos);
         }
         return false;
+    }
+
+    Agent* Agent::checkPosByAOI(float srcX, float srcY, float& dstX, float& dstY, bool bMove)
+    {
+        float pos1[3] = { srcX, 0, srcY };
+        float pos2[3] = { dstX, 0, dstY };
+        if (dtVequal(pos1, pos2) && !bMove)
+        {
+            return nullptr;
+        }
+        aoi::Rect rect(dstX - mHalfExtents[0], dstX + mHalfExtents[0], dstY - mHalfExtents[2], dstY + mHalfExtents[2]);
+        auto agents = mScene->Query(rect);
+        for (Agent* a = (Agent*)agents; a; a = (Agent*)a->Next())
+        {
+            if (a == this)
+            {
+                continue;
+            }
+            aoi::Rect tempRect(a->getRect());
+            if (rect.Intersects(tempRect))
+            {
+                if (bMove)
+                {
+                    if (!tempRect.Contains(srcX, srcY))
+                    {
+                        return a;
+                    }
+                    return nullptr;
+                }
+                else
+                {
+                    return a;
+                }
+            }
+        }
+        return nullptr;
     }
 }

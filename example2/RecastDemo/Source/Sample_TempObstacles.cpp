@@ -1390,23 +1390,33 @@ void Sample_TempObstacles::getTilePos(const float* pos, int& tx, int& ty)
     ty = (int)((pos[2] - bmin[2]) / ts);
 }
 
-static const int TILECACHESET_MAGIC = 'T' << 24 | 'S' << 16 | 'E' << 8 | 'T'; //'TSET';
-static const int TILECACHESET_VERSION = 1;
+static const int32_t TILECACHESET_MAGIC = 'T' << 24 | 'S' << 16 | 'E' << 8 | 'T'; //'TSET';
+static const int32_t TILECACHESET_VERSION = 1;
+
+#pragma pack(push, 1)
 
 struct TileCacheSetHeader
 {
-    int magic;
-    int version;
-    int numTiles;
+    int32_t magic;
+    int32_t version;
+    int32_t numTiles;
     dtNavMeshParams meshParams;
     dtTileCacheParams cacheParams;
+    float boundsMinX;
+    float boundsMinY;
+    float boundsMinZ;
+    float boundsMaxX;
+    float boundsMaxY;
+    float boundsMaxZ;
 };
 
 struct TileCacheTileHeader
 {
     dtCompressedTileRef tileRef;
-    int dataSize;
+    int32_t dataSize;
 };
+
+#pragma pack(pop)
 
 void Sample_TempObstacles::saveAll(const char* path)
 {
@@ -1420,6 +1430,16 @@ void Sample_TempObstacles::saveAll(const char* path)
     TileCacheSetHeader header;
     header.magic = TILECACHESET_MAGIC;
     header.version = TILECACHESET_VERSION;
+
+    const float* bmin = m_geom->getMeshBoundsMin();
+    const float* bmax = m_geom->getMeshBoundsMax();
+    header.boundsMinX = bmin[0];
+    header.boundsMinY = bmin[1];
+    header.boundsMinZ = bmin[2];
+    header.boundsMaxX = bmax[0];
+    header.boundsMaxY = bmax[1];
+    header.boundsMaxZ = bmax[2];
+
     header.numTiles = 0;
     for (int i = 0; i < m_tileCache->getTileCount(); ++i)
     {

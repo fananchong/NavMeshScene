@@ -325,8 +325,7 @@ void Sample::renderOverlayToolStates(double* proj, double* model, int* view)
 static const int32_t NAVMESHSET_MAGIC = 'M' << 24 | 'S' << 16 | 'E' << 8 | 'T'; //'MSET';
 static const int32_t NAVMESHSET_VERSION = 1;
 
-
-#pragma pack(1)
+#pragma pack(push, 1)
 
 struct NavMeshSetHeader
 {
@@ -334,6 +333,12 @@ struct NavMeshSetHeader
     int32_t version;
     int32_t numTiles;
     dtNavMeshParams params;
+    float boundsMinX;
+    float boundsMinY;
+    float boundsMinZ;
+    float boundsMaxX;
+    float boundsMaxY;
+    float boundsMaxZ;
 };
 
 struct NavMeshTileHeader
@@ -342,7 +347,7 @@ struct NavMeshTileHeader
     int32_t dataSize;
 };
 
-#pragma pack()
+#pragma pack(pop)
 
 
 
@@ -428,6 +433,16 @@ void Sample::saveAll(const char* path, const dtNavMesh* mesh)
     NavMeshSetHeader header;
     header.magic = NAVMESHSET_MAGIC;
     header.version = NAVMESHSET_VERSION;
+
+    const float* bmin = m_geom->getMeshBoundsMin();
+    const float* bmax = m_geom->getMeshBoundsMax();
+    header.boundsMinX = bmin[0];
+    header.boundsMinY = bmin[1];
+    header.boundsMinZ = bmin[2];
+    header.boundsMaxX = bmax[0];
+    header.boundsMaxY = bmax[1];
+    header.boundsMaxZ = bmax[2];
+
     header.numTiles = 0;
     for (int i = 0; i < mesh->getMaxTiles(); ++i)
     {
