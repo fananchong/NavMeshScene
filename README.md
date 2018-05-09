@@ -31,6 +31,8 @@ make config=release_x64
 
 ## 例子
 
+[example2](example2)
+
 ![图1](assets/1.jpg)
 
   - 红色圆柱为受玩家控制的游戏对象
