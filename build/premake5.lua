@@ -49,6 +49,8 @@ project "example1"
         "../example1/*.cpp",
     }
     
+
+if os.is("windows") then
     
 project "example2"
     kind "ConsoleApp"
@@ -69,18 +71,33 @@ project "example2"
         "../example2/**",
     }
     defines { "WIN32", "_WINDOWS", "_CRT_SECURE_NO_WARNINGS", "_HAS_EXCEPTIONS=0" }
+
+
+    configuration { "linux", "gmake" }
+	buildoptions { 
+		"`pkg-config --cflags sdl2`",
+		"`pkg-config --cflags gl`",
+		"`pkg-config --cflags glu`" 
+	}
+	linkoptions { 
+		"`pkg-config --libs sdl2`",
+		"`pkg-config --libs gl`",
+		"`pkg-config --libs glu`" 
+	}
+
+
     configuration { "windows" }
-		includedirs {
+	includedirs {
             "../example2/Contrib/SDL/include",
             -- "../example2/Contrib/fastlz",
         }
         
-		links { 
-			"glu32",
-			"opengl32",
-			"SDL2",
-			"SDL2main",
-		}
+	links { 
+		"glu32",
+		"opengl32",
+		"SDL2",
+		"SDL2main",
+	}
         filter { "platforms:x32" }
             libdirs { "../example2/Contrib/SDL/lib/x86" }
             postbuildcommands {
@@ -93,4 +110,4 @@ project "example2"
                 -- Copy the SDL2 dll to the Bin folder.
                 '{COPY} "%{wks.location}../example2/Contrib/SDL/lib/x64/SDL2.dll" "%{cfg.targetdir}"'
             }
-    
+end

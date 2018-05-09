@@ -10,7 +10,7 @@ int main(int argn, char *argv[]) {
         path = argv[1];
     }
 
-    srand(unsigned int(time(0)));
+    srand((unsigned int)(time(0)));
 
     NavMeshScene::StaticScene scene;
     if (int ec = scene.Load(path.c_str())) {

@@ -1,12 +1,14 @@
 #ifndef __MYNAVMESHSCENE_H__
 #define __MYNAVMESHSCENE_H__
 
+#include "Sample.h"
 #include <scene.h>
 #include <agent.h>
 #include <stdio.h>
 #include <memory>
 #include "Sample.h"
 #include <cmath>
+#include <vector>
 
 class Player : public NavMeshScene::Agent
 {

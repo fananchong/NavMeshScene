@@ -19,6 +19,7 @@
 #ifndef SAMPLEINTERFACES_H
 #define SAMPLEINTERFACES_H
 
+#include <stdio.h>
 #include "DebugDraw.h"
 #include "Recast.h"
 #include "RecastDump.h"

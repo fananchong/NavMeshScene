@@ -4,6 +4,7 @@
 #include "detour.h"
 #include <DetourNavMeshQuery.h>
 #include <DetourCommon.h>
+#include <limits>
 
 namespace NavMeshScene {
 
@@ -53,7 +54,7 @@ namespace NavMeshScene {
         }
         mCurPolyRef = realEndPolyRef;
         dtVcopy(mPosition, realEndPos);
-        if (fabs(X - mPosition[0]) >= FLT_EPSILON || fabs(Y - mPosition[2]) >= FLT_EPSILON)
+        if (fabs(X - mPosition[0]) >= std::numeric_limits<float>::epsilon() || fabs(Y - mPosition[2]) >= std::numeric_limits<float>::epsilon())
         {
             X = mPosition[0];
             Y = mPosition[2];
