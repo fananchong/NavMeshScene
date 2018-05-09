@@ -405,8 +405,10 @@ namespace NavMeshScene {
         float halfExtents[3],
         const dtQueryFilter& filter,
         uint64_t& realEndPolyRef,
-        float realEndPos[3])
+        float realEndPos[3],
+        bool& bHit)
     {
+        bHit = false;
         if (!mQuery) {
             return false;
         }
@@ -420,7 +422,8 @@ namespace NavMeshScene {
             realEndPos,
             visited,
             &nvisited,
-            sizeof(visited) / sizeof(visited[0])
+            sizeof(visited) / sizeof(visited[0]),
+            bHit
         );
 
         if (dtStatusDetail(status, DT_INVALID_PARAM)) {
@@ -438,7 +441,8 @@ namespace NavMeshScene {
                 realEndPos,
                 visited,
                 &nvisited,
-                sizeof(visited) / sizeof(visited[0])
+                sizeof(visited) / sizeof(visited[0]),
+                bHit
             );
         }
 

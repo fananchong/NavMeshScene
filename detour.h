@@ -30,7 +30,8 @@ namespace NavMeshScene {
             float halfExtents[3],
             const dtQueryFilter& filter,
             uint64_t& realEndPolyRef,
-            float realEndPos[3]);
+            float realEndPos[3],
+            bool& bHit);
 
         bool GetPoly(
             float pos[3],

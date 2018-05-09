@@ -1,38 +1,43 @@
 # NavMeshScene
 
-## 更新submodules
+## 功能
+
+  - 使用recastnavigation构建3D场景，支持Solo Mesh、Tile Mesh、Temp Obstacles
+  - 提供游戏对象地面行走
+  - 提供游戏对象间碰撞，及事件通知
+  - 提供游戏对象与场景碰撞，及事件通知
+  - 支持改变地形
+
+## build
+
+**window**
+
+```dos
+git submodule update --init -- "aoi"
+cd build
+g.bat
+```
+
+打开 NavMeshScene.sln
+
+**linux**
 
 ```bash
 git submodule update --init -- "aoi"
+cd build
+g.sh
+make config=release_x64
 ```
 
-## 使用示例
+## 例子
 
-```c++
-int main(int argn, char *argv[]) {
-    srand(unsigned int(time(0)));
-    std::string path = "Meshes/nav_test.obj.tile.bin";
-    NavMeshScene::StaticScene scene;
-    if (int ec = scene.Load(path.c_str())) {
-        std::cout << "load scene fail! errcode: " << ec << std::endl;
-        return 1;
-    }
-    std::cout << "load scene success!" << std::endl;
+![图1](assets/1.jpg)
 
-    auto agent = std::make_shared<NavMeshScene::Agent>();
-    scene.AddAgent(1, agent);
-    agent->RandomPosition();
+  - 红色圆柱为受玩家控制的游戏对象
+  - 绿色圆柱为AI游戏对象
+  - 黄色圆柱为`动态障碍物`，可以改变地形
 
-    auto pos = agent->GetPosition();
 
-    float velocity[3] = { 5,0,5 };
-    agent->SetVelocity(velocity);
+## TODO:
 
-    while (true) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(25));
-        scene.Simulation(0.025f);
-    }
-
-    return 0;
-}
-```
+  - 完善AOI系统，内置观察者列表，让移动效率更高效。

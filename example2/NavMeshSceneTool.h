@@ -6,12 +6,13 @@
 #include <stdio.h>
 #include <memory>
 #include "Sample.h"
+#include <cmath>
 
 class Player : public NavMeshScene::Agent
 {
 public:
 
-    void OnHitAgent(Agent* agent) override
+    void OnHit(Agent* agent) override
     {
         if (!mRobot)
         {
@@ -20,29 +21,17 @@ public:
         changeDir();
     }
 
-    void Update(float delta) override
-    {
-        NavMeshScene::Agent::Update(delta);
-
-        if (!mRobot)
-        {
-            return;
-        }
-
-        auto v = GetVelocity();
-        if (v[0] = 0 && v[1] == 0 && v[2] == 0)
-        {
-            changeDir();
-        }
-    }
-
 public:
 
     void changeDir()
     {
-        float vx = float((rand() % 6 + 3) * (rand() % 2 == 0 ? 1 : -1));
-        float vy = float((rand() % 6 + 3) * (rand() % 2 == 0 ? 1 : -1));
-        float v[3] = { vx,0, vy };
+        float angle = float(rand() % 360);
+        float vx = cos(3.14f * angle / 180);
+        float vy = -sin(3.14f * angle / 180);
+        float s = sqrt(vx*vx + vy*vy);
+        vx = vx / s;
+        vy = vy / s;
+        float v[3] = { vx * 5, 0, vy * 5 };
         SetVelocity(v);
     }
 

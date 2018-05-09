@@ -373,7 +373,8 @@ public:
 	/// @returns The status flags for the query.
 	dtStatus moveAlongSurface(dtPolyRef startRef, const float* startPos, const float* endPos,
 							  const dtQueryFilter* filter,
-							  float* resultPos, dtPolyRef* visited, int* visitedCount, const int maxVisitedSize) const;
+							  float* resultPos, dtPolyRef* visited, int* visitedCount, const int maxVisitedSize,
+                              bool& bHit) const;
 	
 	/// Casts a 'walkability' ray along the surface of the navigation mesh from 
 	/// the start position toward the end position.

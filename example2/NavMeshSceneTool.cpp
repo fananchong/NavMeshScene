@@ -52,7 +52,11 @@ void NavMeshSceneTool::doInit() {
         mAgents.push_back(agent);
         mScene->AddAgent(i + 1, agent);
         agent->RandomPosition();
-        agent->changeDir();
+
+        // 3/4 agent“∆∂Ø
+        if (rand() % 4 <= 2) {
+            agent->changeDir();
+        }
     }
     if (mCurrentAgent >= 0)
     {
@@ -128,7 +132,7 @@ void NavMeshSceneTool::handleUpdate(const float dt)
         return;
     }
 
-    float velocity[3] = { (gMoveLeft*-1 + gMoveRight) * 3,0,(gMoveFront*-1 + gMoveBack) * 3 };
+    float velocity[3] = { (gMoveLeft*-1 + gMoveRight) * 3, 0, (gMoveFront*-1 + gMoveBack) * 3 };
     mAgents[mCurrentAgent]->SetVelocity(velocity);
     mScene->Simulation(dt);
 }

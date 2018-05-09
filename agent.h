@@ -6,7 +6,7 @@
 
 namespace NavMeshScene {
 
-    const float DEFAULT_HALF_EXTENTS[3] = { 0.6f, 2.0f, 0.9f };
+    const float DEFAULT_HALF_EXTENTS[3] = { 0.6f, 2.0f, 0.6f };
 
     class Filter;
     class Scene;
@@ -31,15 +31,15 @@ namespace NavMeshScene {
         inline void SetScene(Scene* scene) { mScene = scene; }
 
         virtual void Update(float delta);
-        void SetPosition(float v[3]);
+        bool SetPosition(float v[3]);
         void RandomPosition();
         bool Raycast(float endPos[3], bool& bHit, float hitPos[3]);
 
-        virtual void OnHitAgent(Agent* agent) {}
+        virtual void OnHit(Agent* agent = nullptr) {}
 
 
     protected:
-        bool TryMove(float endPos[3], uint64_t& realEndPolyRef, float realEndPos[3]);
+        bool TryMove(float endPos[3], uint64_t& realEndPolyRef, float realEndPos[3], bool& bHit);
 
         inline aoi::Rect getRect() { return aoi::Rect(mPosition[0] - mHalfExtents[0], mPosition[0] + mHalfExtents[0], mPosition[2] - mHalfExtents[2], mPosition[2] + mHalfExtents[2]); }
         Agent* checkPosByAOI(float srcX, float srcY, float& dstX, float& dstY, bool bMove);
