@@ -111,3 +111,14 @@ project "example2"
                 '{COPY} "%{wks.location}../example2/Contrib/SDL/lib/x64/SDL2.dll" "%{cfg.targetdir}"'
             }
 end
+
+
+project "test1"
+    kind "ConsoleApp"
+    targetname "test1"
+    libdirs { "../bin" }
+    links { "NavMeshScene" }
+    files {
+        "../tests/test1/*.h",
+        "../tests/test1/*.cpp",
+    }

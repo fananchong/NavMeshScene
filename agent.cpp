@@ -130,7 +130,6 @@ namespace NavMeshScene {
 
     Agent* Agent::checkPosByAOI(float srcX, float srcY, float& dstX, float& dstY, bool bMove)
     {
-        // TODO: 暂时每次Query，正式应该AOI包提供AOI接口为佳。
         float pos1[3] = { srcX, 0, srcY };
         float pos2[3] = { dstX, 0, dstY };
         aoi::Rect rect(dstX - mHalfExtents[0], dstX + mHalfExtents[0], dstY - mHalfExtents[2], dstY + mHalfExtents[2]);

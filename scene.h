@@ -28,6 +28,9 @@ namespace NavMeshScene {
         void AddAgent(uint64_t id, const std::shared_ptr<Agent>& agent);
         void RemoveAgent(uint64_t id);
 
+        float* GetBoundsMin();
+        float* GetBoundsMax();
+
     public:
         inline Detour& GetDetour() { return *mDetour; }
         inline Filter& GetDefaultFilter() { return *mDefaultFilter; }

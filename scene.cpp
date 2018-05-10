@@ -57,6 +57,16 @@ namespace NavMeshScene {
         }
     }
 
+    float* Scene::GetBoundsMin()
+    {
+        return mDetour->GetBoundsMin();
+    }
+
+    float* Scene::GetBoundsMax()
+    {
+        return mDetour->GetBoundsMax();
+    }
+
 
     DynamicScene::DynamicScene(int heightMode)
         : Scene(false)
@@ -83,5 +93,4 @@ namespace NavMeshScene {
     void DynamicScene::RemoveObstacle(unsigned int obstacleId) {
         mDetour->RemoveObstacle(obstacleId);
     }
-
 }
