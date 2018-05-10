@@ -3,6 +3,7 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <cmath>
 
 long long get_tick_count(void)
 {
@@ -62,13 +63,15 @@ int main(int argn, char *argv[]) {
         agent->RandomPosition();
         agent->changeDir();
     }
+    printf("add player count: %llu\n", PLAYER_COUNT);
+
     auto t1 = get_tick_count();
     for (size_t i = 0; i < TEST_COUNT; i++)
     {
         scene.Simulation(0.025f);
     }
     auto t2 = get_tick_count();
-    printf("simulation cost:%10lldns %10.3fns/op %10.3fms/op\n", t2 - t1, float(t2 - t1) / TEST_COUNT, float(t2 - t1) / TEST_COUNT / 1000000);
+    printf("simulation cost:%12lldns %12.3fns/op %12.3fms/op\n", t2 - t1, float(t2 - t1) / TEST_COUNT, float(t2 - t1) / TEST_COUNT / 1000000);
 
     return 0;
 }
