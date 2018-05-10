@@ -54,3 +54,14 @@ AOI半径    | 0.6
   - 红色圆柱为受玩家控制的游戏对象
   - 绿色圆柱为AI游戏对象
   - 黄色圆柱为`动态障碍物`，可以改变地形
+
+
+## 地图资源说明
+
+NavMeshScene 加载的地图资源使用 exampe2 工具导出的。
+
+exampe2 在 recastnavigation 工具基础上，对文件头做对齐处理；增加了地图bounds等信息这些操作。
+
+因此直接使用 recastnavigation 原工具导出的地图，会无法识别。
+
+请使用 exampe2 来导出地图资源。
