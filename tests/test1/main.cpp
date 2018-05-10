@@ -63,7 +63,7 @@ int main(int argn, char *argv[]) {
         agent->RandomPosition();
         agent->changeDir();
     }
-    printf("add player count: %llu\n", PLAYER_COUNT);
+    printf("player count: %u\n", unsigned(PLAYER_COUNT));
 
     auto t1 = get_tick_count();
     for (size_t i = 0; i < TEST_COUNT; i++)

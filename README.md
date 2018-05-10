@@ -29,6 +29,22 @@ g.sh
 make config=release_x64
 ```
 
+## 目前性能
+
+![图2](assets/2.jpg)
+
+相关内容   | 说明
+--------- | -----------------------------------
+测试例子   | [tests/test1](tests/test1/main.cpp)
+场景大小   | 1000 * 1000
+游戏对象数 | 5000
+AOI半径    | 0.6
+一次op     | 对所有游戏对象做一次移动
+
+**测试机器配置**
+
+阿里云ECS服务器，配置： 1 vCPU 2 GB (I/O优化) ecs.t5-lc1m2.small 1Mbps
+
 ## 例子
 
 [example2](example2)
