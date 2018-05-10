@@ -34,16 +34,13 @@ public:
     }
 };
 
-int main(int argn, char *argv[]) {
+typedef NavMeshScene::StaticScene SceneType1;
+typedef NavMeshScene::DynamicScene SceneType2;
 
-    std::string path = "Meshes/scene1.obj.tile.bin";
-    if (argn >= 2) {
-        path = argv[1];
-    }
-
-    srand((unsigned int)(time(0)));
-
-    NavMeshScene::StaticScene scene;
+template<class T>
+int test(const std::string& path)
+{
+    T scene;
     if (int ec = scene.Load(path.c_str())) {
         std::cout << "load scene fail! errcode: " << ec << std::endl;
         return 1;
@@ -72,6 +69,26 @@ int main(int argn, char *argv[]) {
     }
     auto t2 = get_tick_count();
     printf("simulation cost:%12lldns %12.3fns/op %12.3fms/op\n", t2 - t1, float(t2 - t1) / TEST_COUNT, float(t2 - t1) / TEST_COUNT / 1000000);
+    return 0;
+}
 
+int main(int argn, char *argv[]) {
+
+    std::string path1 = "Meshes/scene1.obj.tile.bin";
+    std::string path2 = "Meshes/scene1.obj.tilecache.bin";
+
+    srand((unsigned int)(time(0)));
+
+    printf("Static Scene ==============================================\n");
+    test<SceneType1>(path1);
+    printf("\n\n");
+
+    printf("Dynamic Scene (Type 1) ==============================================\n");
+    test<SceneType2>(path1);
+    printf("\n\n");
+
+    printf("Dynamic Scene (Type 2) ==============================================\n");
+    test<SceneType2>(path2);
+    printf("\n\n");
     return 0;
 }
