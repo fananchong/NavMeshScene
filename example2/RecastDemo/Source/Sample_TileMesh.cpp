@@ -41,7 +41,7 @@
 #include "OffMeshConnectionTool.h"
 #include "ConvexVolumeTool.h"
 #include "CrowdTool.h"
-
+#include "../NavMeshSceneTool.h"
 
 #ifdef WIN32
 #	define snprintf _snprintf
@@ -358,6 +358,10 @@ void Sample_TileMesh::handleTools()
     if (imguiCheck("Create Crowds", type == TOOL_CROWD))
     {
         setTool(new CrowdTool);
+    }
+    if (imguiCheck("NavMeshScene", type == TOOL_MY_NAV_MESH_SCENE))
+    {
+        setTool(new NavMeshSceneTool);
     }
 
     imguiSeparatorLine();
