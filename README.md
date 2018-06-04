@@ -62,6 +62,9 @@ NavMeshScene 加载的地图资源使用 exampe2 工具导出的。
 
 exampe2 在 recastnavigation 工具基础上，对文件头做对齐处理；增加了地图bounds等信息这些操作。
 
-因此直接使用 recastnavigation 原工具导出的地图，会无法识别。
+同时，也支持 recastnavigation 原工具导出的资源格式。
 
-请使用 exampe2 来导出地图资源。
+## DOTO
+
+- 新增新的随机地图位置算法，原随机算法对于Tile类型大地图太慢
+
