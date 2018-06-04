@@ -22,6 +22,9 @@ namespace NavMeshScene {
         int32_t version;
         int32_t numTiles;
         dtNavMeshParams params;
+    };
+    struct NavMeshSetHeaderExt
+    {
         float boundsMinX;
         float boundsMinY;
         float boundsMinZ;
@@ -43,6 +46,9 @@ namespace NavMeshScene {
         int32_t numTiles;
         dtNavMeshParams meshParams;
         dtTileCacheParams cacheParams;
+    };
+    struct TileCacheSetHeaderExt
+    {
         float boundsMinX;
         float boundsMinY;
         float boundsMinZ;
@@ -59,9 +65,11 @@ namespace NavMeshScene {
 
 #pragma pack(pop)
 
-    static const int32_t NAVMESHSET_MAGIC = 'M' << 24 | 'S' << 16 | 'E' << 8 | 'T';
+    static const int32_t NAVMESHSET_MAGIC_RAW = 'M' << 24 | 'S' << 16 | 'E' << 8 | 'T';
+    static const int32_t NAVMESHSET_MAGIC_EXT = 'M' << 24 | 'S' << 16 | 'A' << 8 | 'T';
     static const int32_t NAVMESHSET_VERSION = 1;
-    static const int32_t TILECACHESET_MAGIC = 'T' << 24 | 'S' << 16 | 'E' << 8 | 'T';
+    static const int32_t TILECACHESET_MAGIC_RAW = 'T' << 24 | 'S' << 16 | 'E' << 8 | 'T';
+    static const int32_t TILECACHESET_MAGIC_EXT = 'T' << 24 | 'S' << 16 | 'A' << 8 | 'T';
     static const int32_t TILECACHESET_VERSION = 1;
 
 
@@ -225,7 +233,7 @@ namespace NavMeshScene {
             errCode = 102;
             return nullptr;
         }
-        if (header.magic != NAVMESHSET_MAGIC)
+        if (header.magic != NAVMESHSET_MAGIC_RAW && header.magic != NAVMESHSET_MAGIC_EXT)
         {
             errCode = 103;
             return nullptr;
@@ -236,12 +244,29 @@ namespace NavMeshScene {
             return nullptr;
         }
 
-        mBoundsMin[0] = header.boundsMinX;
-        mBoundsMin[1] = header.boundsMinY;
-        mBoundsMin[2] = header.boundsMinZ;
-        mBoundsMax[0] = header.boundsMaxX;
-        mBoundsMax[1] = header.boundsMaxY;
-        mBoundsMax[2] = header.boundsMaxZ;
+        if (header.magic == NAVMESHSET_MAGIC_EXT) {
+            NavMeshSetHeaderExt headerExt;
+            size_t readLen = fread(&headerExt, sizeof(NavMeshSetHeaderExt), 1, fp);
+            if (readLen != 1)
+            {
+                errCode = 102;
+                return nullptr;
+            }
+            mBoundsMin[0] = headerExt.boundsMinX;
+            mBoundsMin[1] = headerExt.boundsMinY;
+            mBoundsMin[2] = headerExt.boundsMinZ;
+            mBoundsMax[0] = headerExt.boundsMaxX;
+            mBoundsMax[1] = headerExt.boundsMaxY;
+            mBoundsMax[2] = headerExt.boundsMaxZ;
+        }
+        else {
+            mBoundsMin[0] = 0;
+            mBoundsMin[1] = 0;
+            mBoundsMin[2] = 0;
+            mBoundsMax[0] = 0;
+            mBoundsMax[1] = 0;
+            mBoundsMax[2] = 0;
+        }
 
         dtNavMesh* mesh = dtAllocNavMesh();
         if (!mesh)
@@ -306,7 +331,7 @@ namespace NavMeshScene {
             errCode = 202;
             return nullptr;
         }
-        if (header.magic != TILECACHESET_MAGIC)
+        if (header.magic != TILECACHESET_MAGIC_RAW && header.magic != TILECACHESET_MAGIC_EXT)
         {
             errCode = 203;
             return nullptr;
@@ -317,12 +342,29 @@ namespace NavMeshScene {
             return nullptr;
         }
 
-        mBoundsMin[0] = header.boundsMinX;
-        mBoundsMin[1] = header.boundsMinY;
-        mBoundsMin[2] = header.boundsMinZ;
-        mBoundsMax[0] = header.boundsMaxX;
-        mBoundsMax[1] = header.boundsMaxY;
-        mBoundsMax[2] = header.boundsMaxZ;
+        if (header.magic == TILECACHESET_MAGIC_EXT) {
+            TileCacheSetHeaderExt headerExt;
+            size_t readLen = fread(&headerExt, sizeof(TileCacheSetHeaderExt), 1, fp);
+            if (readLen != 1)
+            {
+                errCode = 102;
+                return nullptr;
+            }
+            mBoundsMin[0] = headerExt.boundsMinX;
+            mBoundsMin[1] = headerExt.boundsMinY;
+            mBoundsMin[2] = headerExt.boundsMinZ;
+            mBoundsMax[0] = headerExt.boundsMaxX;
+            mBoundsMax[1] = headerExt.boundsMaxY;
+            mBoundsMax[2] = headerExt.boundsMaxZ;
+        }
+        else {
+            mBoundsMin[0] = 0;
+            mBoundsMin[1] = 0;
+            mBoundsMin[2] = 0;
+            mBoundsMax[0] = 0;
+            mBoundsMax[1] = 0;
+            mBoundsMax[2] = 0;
+        }
 
         mMesh = dtAllocNavMesh();
         if (!mMesh)

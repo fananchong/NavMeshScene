@@ -1390,7 +1390,7 @@ void Sample_TempObstacles::getTilePos(const float* pos, int& tx, int& ty)
     ty = (int)((pos[2] - bmin[2]) / ts);
 }
 
-static const int32_t TILECACHESET_MAGIC = 'T' << 24 | 'S' << 16 | 'E' << 8 | 'T'; //'TSET';
+static const int32_t TILECACHESET_MAGIC = 'T' << 24 | 'S' << 16 | 'A' << 8 | 'T'; //'TSET';
 static const int32_t TILECACHESET_VERSION = 1;
 
 #pragma pack(push, 1)
