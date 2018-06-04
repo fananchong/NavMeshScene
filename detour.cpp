@@ -494,7 +494,10 @@ namespace NavMeshScene {
             return false;
         }
 
-        realEndPolyRef = visited[nvisited - 1];
+        realEndPolyRef = startPolyRef;
+        if (nvisited > 0) {
+            realEndPolyRef = visited[nvisited - 1];
+        }
 
         if (mHeightMode != DynamicScene::HEIGHT_MODE_2) {
             float h = 0;
