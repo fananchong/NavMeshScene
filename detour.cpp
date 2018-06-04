@@ -12,6 +12,7 @@
 namespace NavMeshScene {
 
     std::unordered_map<std::string, dtNavMesh*> Detour::mStaticMesh;
+    std::mutex Detour::mMutex;
 
 #pragma pack(push, 1)
 
@@ -194,6 +195,7 @@ namespace NavMeshScene {
 
     dtNavMesh* Detour::createStaticMesh(const char*path, int& errCode) {
         dtNavMesh* mesh = nullptr;
+        std::lock_guard<std::mutex> lock(mMutex);
         auto it = Detour::mStaticMesh.find(path);
         if (it != Detour::mStaticMesh.end()) {
             mesh = it->second;

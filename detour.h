@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <mutex>
 
 class dtNavMesh;
 class dtNavMeshQuery;
@@ -88,6 +89,7 @@ namespace NavMeshScene {
         MeshProcess* mTmproc;
         dtNavMeshQuery* mQueryForHeightMode2;
         static std::unordered_map<std::string, dtNavMesh*> mStaticMesh;
+        static std::mutex mMutex;
     };
 
 }
