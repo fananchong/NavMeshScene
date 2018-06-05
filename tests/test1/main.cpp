@@ -38,9 +38,8 @@ typedef NavMeshScene::StaticScene SceneType1;
 typedef NavMeshScene::DynamicScene SceneType2;
 
 template<class T>
-int test(const std::string& path)
+int test(T& scene, const std::string& path)
 {
-    T scene;
     if (int ec = scene.Load(path.c_str())) {
         std::cout << "load scene fail! errcode: " << ec << std::endl;
         return 1;
@@ -80,15 +79,18 @@ int main(int argn, char *argv[]) {
     srand((unsigned int)(time(0)));
 
     printf("Static Scene ==============================================\n");
-    test<SceneType1>(path1);
+    SceneType1 scn1;
+    test<SceneType1>(scn1, path1);
     printf("\n\n");
 
     printf("Dynamic Scene (Type 1) ==============================================\n");
-    test<SceneType2>(path1);
+    SceneType2 scn2(NavMeshScene::DynamicScene::HEIGHT_MODE_1);
+    test<SceneType2>(scn2, path1);
     printf("\n\n");
 
     printf("Dynamic Scene (Type 2) ==============================================\n");
-    test<SceneType2>(path2);
+    SceneType2 scn3(NavMeshScene::DynamicScene::HEIGHT_MODE_2);
+    test<SceneType2>(scn3, path2);
     printf("\n\n");
     return 0;
 }
