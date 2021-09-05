@@ -149,13 +149,13 @@ namespace NavMeshScene {
     static const size_t FILE_SUFFIX_1_LEN = strlen(FILE_SUFFIX_1);
 
     int Detour::Load(const char*path) {
-        assert(int(std::string(path).find(FILE_SUFFIX_0)) > 0 || int(std::string(path).find(FILE_SUFFIX_1)) > 0);
         int errCode = 0;
         dtNavMesh* mesh = nullptr;
         if (mbStaticMesh) {
             mesh = createStaticMesh(path, errCode);
         }
         else {
+			assert(int(std::string(path).find(FILE_SUFFIX_0)) > 0 || int(std::string(path).find(FILE_SUFFIX_1)) > 0);
             dtNavMesh* tempMesh = nullptr;
             if (mHeightMode == DynamicScene::HEIGHT_MODE_2) {
                 std::string tempPath = path;
